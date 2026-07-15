@@ -43,7 +43,11 @@ class ManagerOrderController extends Controller
             return back()->with('error', 'Only submitted orders can be approved.');
         }
         
-        $order->update(['status' => 'approved']);
+        $order->update([
+            'status' => 'approved',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+        ]);
         
         return redirect()->route('manager.orders.index')->with('success', 'Order approved successfully.');
     }

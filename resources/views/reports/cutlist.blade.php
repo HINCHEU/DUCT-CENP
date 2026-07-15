@@ -15,10 +15,11 @@
     td { border-bottom: 1px solid #dde3f0; padding: 9px 12px; }
     tr:nth-child(even) td { background: #f4f6fb; }
     tfoot td { font-weight: 700; background: #1B3F8B; color: #fff; }
-    .sig-section { width: 100%; margin-top: 50px; }
-    .sig-box { width: 24%; display: inline-block; text-align: center; font-size: 12px; }
-    .sig-line { border-top: 2px solid #1B3F8B; height: 10px; margin-bottom: 12px; margin-left: 10px; margin-right: 10px; }
-    .sig-label { font-weight: 600; color: #1B3F8B; letter-spacing: 0.5px; }
+    .sig-table { width: 100%; border-collapse: collapse; margin-top: 50px; table-layout: fixed; margin-bottom: 0; }
+    .sig-col { border: 1px solid #1B3F8B; width: 25%; vertical-align: top; padding: 0; background-color: #fff !important; }
+    .sig-title { text-align: center; padding: 8px 0; font-size: 12px; font-weight: 600; color: #1B3F8B; margin: 0 10px; border-bottom: 1px solid #1B3F8B; letter-spacing: 0.5px; }
+    .sig-space { height: 80px; }
+    .sig-details { margin: 0 10px; border-top: 1px solid #1B3F8B; padding: 8px 0; font-size: 11px; color: #555; line-height: 1.4; text-align: left; }
   </style>
 </head>
 <body>
@@ -136,32 +137,51 @@
       </table>
     @endif
 
-    <div class="sig-section">
-      <div class="sig-box">
-        <div class="sig-line"></div>
-        <div class="sig-label">Prepared By</div>
-        <div style="font-size: 11px; color: #555; margin-top: 4px; line-height: 1.4;">
-            {{ optional($order->creator)->name }}<br>
-            {{ $order->submitted_at ? $order->submitted_at->format('d/m/Y') : $order->created_at->format('d/m/Y') }}
-        </div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-line"></div>
-        <div class="sig-label">Checked By</div>
-        <div style="font-size: 11px; color: #555; margin-top: 4px; line-height: 1.4;">
-            {{ optional($order->approver)->name }}<br>
-            {{ $order->approved_at ? $order->approved_at->format('d/m/Y') : '' }}
-        </div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-line"></div>
-        <div class="sig-label">Transported By</div>
-      </div>
-      <div class="sig-box">
-        <div class="sig-line"></div>
-        <div class="sig-label">Received By</div>
-      </div>
-    </div>
+    @php
+      $cName = optional($order->creator)->name ?? '';
+      $cLen = strlen($cName);
+      $cSize = $cLen > 18 ? '9px' : ($cLen > 14 ? '10px' : '11px');
+
+      $aName = optional($order->approver)->name ?? '';
+      $aLen = strlen($aName);
+      $aSize = $aLen > 18 ? '9px' : ($aLen > 14 ? '10px' : '11px');
+    @endphp
+    <table class="sig-table">
+      <tr>
+        <td class="sig-col">
+          <div class="sig-title">Prepared By</div>
+          <div class="sig-space"></div>
+          <div class="sig-details">
+            Name: <span style="font-size: {{ $cSize }}; white-space: nowrap; letter-spacing: -0.2px;">{{ $cName }}</span><br>
+            Date: {{ $order->submitted_at ? $order->submitted_at->format('d/M/Y') : $order->created_at->format('d/M/Y') }}
+          </div>
+        </td>
+        <td class="sig-col">
+          <div class="sig-title">Checked By</div>
+          <div class="sig-space"></div>
+          <div class="sig-details">
+            Name: <span style="font-size: {{ $aSize }}; white-space: nowrap; letter-spacing: -0.2px;">{{ $aName }}</span><br>
+            Date: {{ $order->approved_at ? $order->approved_at->format('d/M/Y') : '' }}
+          </div>
+        </td>
+        <td class="sig-col">
+          <div class="sig-title">Transported By</div>
+          <div class="sig-space"></div>
+          <div class="sig-details">
+            Name: <br>
+            Date: 
+          </div>
+        </td>
+        <td class="sig-col">
+          <div class="sig-title">Received By</div>
+          <div class="sig-space"></div>
+          <div class="sig-details">
+            Name: <br>
+            Date: 
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 </body>
 </html>

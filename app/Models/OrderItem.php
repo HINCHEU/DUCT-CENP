@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-    protected $fillable = ['order_id', 'duct_type_id', 'dimensions', 'quantity', 'quantity_delivered', 'surface_area', 'fabrication_status'];
+    protected $fillable = ['order_id', 'duct_type_id', 'dimensions', 'quantity', 'quantity_delivered', 'surface_area', 'total_area', 'fabrication_status', 'thickness', 'canvas_flange', 'inner_strut', 'remarks'];
 
     protected function casts(): array
     {

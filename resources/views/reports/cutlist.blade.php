@@ -140,10 +140,18 @@
       <div class="sig-box">
         <div class="sig-line"></div>
         <div class="sig-label">Prepared By</div>
+        <div style="font-size: 11px; color: #555; margin-top: 4px; line-height: 1.4;">
+            {{ optional($order->creator)->name }}<br>
+            {{ $order->submitted_at ? $order->submitted_at->format('d/m/Y') : $order->created_at->format('d/m/Y') }}
+        </div>
       </div>
       <div class="sig-box">
         <div class="sig-line"></div>
         <div class="sig-label">Checked By</div>
+        <div style="font-size: 11px; color: #555; margin-top: 4px; line-height: 1.4;">
+            {{ optional($order->approver)->name }}<br>
+            {{ $order->approved_at ? $order->approved_at->format('d/m/Y') : '' }}
+        </div>
       </div>
       <div class="sig-box">
         <div class="sig-line"></div>

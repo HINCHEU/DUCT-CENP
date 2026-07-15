@@ -13,6 +13,7 @@ class Order extends Model
         return [
             'submitted_at' => 'datetime',
             'approved_at' => 'datetime',
+            'requested_delivery_date' => 'date',
         ];
     }
 

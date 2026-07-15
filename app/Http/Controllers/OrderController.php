@@ -106,4 +106,17 @@ class OrderController extends Controller
         
         return redirect()->route('engineer.orders.index')->with('success', 'Order submitted successfully.');
     }
+
+    public function revertToDraft(Order $order)
+    {
+        $this->authorize('revert', $order);
+        
+        if ($order->status !== 'submitted') {
+            return back()->with('error', 'Only submitted orders can be reverted to draft.');
+        }
+        
+        $order->update(['status' => 'draft']);
+        
+        return back()->with('success', 'Order reverted to draft.');
+    }
 }

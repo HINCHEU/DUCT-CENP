@@ -54,7 +54,7 @@
                 <span class="meta-value">{{ ucfirst($order->priority) }}</span>
             </div>
             <div class="meta-item">
-                <span class="meta-label">Delivery Date</span>
+                <span class="meta-label">Requested Delivery</span>
                 <span class="meta-value">{{ $order->requested_delivery_date ? $order->requested_delivery_date->format('M d, Y') : 'TBD' }}</span>
             </div>
         </div>
@@ -64,6 +64,14 @@
                     @csrf
                     <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit this order?')">
                         Submit Order
+                    </button>
+                </form>
+            @endif
+            @if($order->status === 'submitted')
+                <form action="{{ route('engineer.orders.revert', $order) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary" onclick="return confirm('Are you sure you want to revert this order back to draft?')">
+                        Set to Draft
                     </button>
                 </form>
             @endif

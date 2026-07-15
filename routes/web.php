@@ -6,6 +6,7 @@ use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\ManagerOrderController;
 use App\Http\Controllers\WorkshopOrderController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -21,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:engineer'])->prefix('engineer')->name('engineer.')->group(function () {
         Route::resource('orders', OrderController::class);
         Route::post('orders/{order}/submit', [OrderController::class, 'submit'])->name('orders.submit');
+        Route::post('orders/{order}/revert', [OrderController::class, 'revertToDraft'])->name('orders.revert');
         
         Route::resource('orders.items', OrderItemController::class)->except(['index', 'show']);
     });

@@ -4,7 +4,7 @@
 <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
         <h2 style="font-family:'Barlow Condensed', sans-serif; font-size:24px; color:#1B3F8B;">My Orders</h2>
-        <a href="{{ route('engineer.orders.create') }}" class="btn btn-primary" style="text-decoration:none;">
+        <a href="{{ route('engineer.orders.create') }}" class="btn btn-primary" style="text-decoration:none; flex: none;">
             + Create New Order
         </a>
     </div>

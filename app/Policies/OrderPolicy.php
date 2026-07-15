@@ -66,14 +66,23 @@ class OrderPolicy
         return false;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Order $order): bool
     {
         // Only engineers can delete their own draft orders
         if ($user->hasPermissionTo('orders.edit-own') && $user->id === $order->created_by) {
             return $order->status === 'draft';
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the user can revert a submitted order back to draft.
+     */
+    public function revert(User $user, Order $order): bool
+    {
+        if ($user->hasPermissionTo('orders.edit-own') && $user->id === $order->created_by) {
+            return $order->status === 'submitted';
         }
 
         return false;

@@ -12,4 +12,9 @@ class Site extends Model
     {
         return $this->belongsTo(User::class, 'manager_id');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_sites');
+    }
 }

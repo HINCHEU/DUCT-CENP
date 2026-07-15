@@ -24,7 +24,8 @@ class UserForm
                 DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()
-                    ->required(),
+                    ->required(fn (string $context): bool => $context === 'create')
+                    ->hidden(fn (string $context): bool => $context === 'edit'),
                 Select::make('position')
                     ->options([
                         'Admin' => 'Admin',
@@ -38,7 +39,14 @@ class UserForm
                     ->multiple()
                     ->preload()
                     ->searchable(),
+                Select::make('managedSites')
+                    ->label('Managed Sites (Project Manager)')
+                    ->relationship('managedSites', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
                 Select::make('sites')
+                    ->label('Assigned Sites (Engineer/Worker)')
                     ->relationship('sites', 'name')
                     ->multiple()
                     ->preload()

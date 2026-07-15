@@ -30,7 +30,8 @@ class OrderPolicy
         }
 
         if ($user->hasPermissionTo('orders.view-site')) {
-            return $user->sites()->where('site_id', $order->site_id)->exists();
+            return $user->sites()->where('site_id', $order->site_id)->exists()
+                || $user->managedSites()->where('id', $order->site_id)->exists();
         }
 
         return false;
@@ -56,8 +57,9 @@ class OrderPolicy
 
         // Managers can edit submitted orders for their sites
         if ($user->hasPermissionTo('orders.edit-site')) {
-            if ($order->status === 'submitted' && $user->sites()->where('site_id', $order->site_id)->exists()) {
-                return true;
+            if ($order->status === 'submitted') {
+                return $user->sites()->where('site_id', $order->site_id)->exists()
+                    || $user->managedSites()->where('id', $order->site_id)->exists();
             }
         }
 

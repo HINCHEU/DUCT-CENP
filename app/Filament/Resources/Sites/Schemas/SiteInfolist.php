@@ -12,8 +12,8 @@ class SiteInfolist
         return $schema
             ->components([
                 TextEntry::make('name'),
-                TextEntry::make('manager_id')
-                    ->numeric()
+                TextEntry::make('manager.name')
+                    ->label('Manager')
                     ->placeholder('-'),
                 TextEntry::make('created_at')
                     ->dateTime()

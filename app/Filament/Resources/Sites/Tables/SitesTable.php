@@ -17,8 +17,12 @@ class SitesTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('manager_id')
-                    ->numeric()
+                TextColumn::make('manager.name')
+                    ->label('Manager')
+                    ->sortable(),
+                TextColumn::make('users_count')
+                    ->counts('users')
+                    ->label('Total Workers')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

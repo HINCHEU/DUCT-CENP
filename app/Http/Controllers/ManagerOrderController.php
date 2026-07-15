@@ -12,8 +12,10 @@ class ManagerOrderController extends Controller
     {
         $user = Auth::user();
         
-        // Manager can view submitted and approved orders for their sites
-        $siteIds = $user->sites()->pluck('site_id');
+        // Manager can view submitted and approved orders for their managed and assigned sites
+        $assignedSiteIds = $user->sites()->pluck('site_id');
+        $managedSiteIds = $user->managedSites()->pluck('id');
+        $siteIds = $assignedSiteIds->merge($managedSiteIds)->unique();
         
         $orders = Order::whereIn('site_id', $siteIds)
             ->whereIn('status', ['submitted', 'approved', 'fabricating', 'ready', 'delivered', 'rejected'])

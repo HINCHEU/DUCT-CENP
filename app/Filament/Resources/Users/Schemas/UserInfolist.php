@@ -26,6 +26,18 @@ class UserInfolist
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
+                TextEntry::make('managedSites.name')
+                    ->label('Managed Sites')
+                    ->badge()
+                    ->placeholder('-'),
+                TextEntry::make('sites.name')
+                    ->label('Assigned Sites')
+                    ->badge()
+                    ->placeholder('-'),
+                TextEntry::make('roles.name')
+                    ->label('Roles')
+                    ->badge()
+                    ->placeholder('-'),
             ]);
     }
 }

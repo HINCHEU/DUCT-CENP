@@ -56,4 +56,9 @@ class User extends Authenticatable
                     ->withPivot('assigned_from')
                     ->withTimestamps();
     }
+
+    public function managedSites()
+    {
+        return $this->hasMany(Site::class, 'manager_id');
+    }
 }

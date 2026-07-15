@@ -4,7 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Site;
+use App\Models\UserSite;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,11 +18,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            DuctTypesSeeder::class,
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $site = Site::create(['name' => 'Example Site A']);
+
+        $pm = User::create([
+            'p_id' => 'PM001',
+            'name' => 'Example Project Manager',
+            'email' => 'pm@example.com',
+            'password' => Hash::make('changeme'),
+            'position' => 'Project Manager',
+        ]);
+        $pm->assignRole('manager');
+        $site->update(['manager_id' => $pm->id]);
+
+        UserSite::create([
+            'user_id' => $pm->id,
+            'site_id' => $site->id,
+            'assigned_from' => now(),
         ]);
     }
 }

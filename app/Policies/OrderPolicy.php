@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Order;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
+
+class OrderPolicy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->hasPermissionTo('orders.view-own') || $user->hasPermissionTo('orders.view-site') || $user->hasRole('workshop');
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, Order $order): bool
+    {
+        if ($user->hasRole('workshop')) {
+            return in_array($order->status, ['approved', 'fabricating', 'ready', 'delivered']);
+        }
+
+        if ($user->hasPermissionTo('orders.view-own')) {
+            return $user->id === $order->created_by;
+        }
+
+        if ($user->hasPermissionTo('orders.view-site')) {
+            return $user->sites()->where('site_id', $order->site_id)->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
+    {
+        return $user->hasPermissionTo('orders.create');
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, Order $order): bool
+    {
+        // Engineers can edit their own draft or rejected orders
+        if ($user->hasPermissionTo('orders.edit-own') && $user->id === $order->created_by) {
+            return in_array($order->status, ['draft', 'rejected']);
+        }
+
+        // Managers can edit submitted orders for their sites
+        if ($user->hasPermissionTo('orders.edit-site')) {
+            if ($order->status === 'submitted' && $user->sites()->where('site_id', $order->site_id)->exists()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Order $order): bool
+    {
+        // Only engineers can delete their own draft orders
+        if ($user->hasPermissionTo('orders.edit-own') && $user->id === $order->created_by) {
+            return $order->status === 'draft';
+        }
+
+        return false;
+    }
+}

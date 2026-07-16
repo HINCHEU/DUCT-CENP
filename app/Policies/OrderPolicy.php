@@ -25,13 +25,15 @@ class OrderPolicy
             return in_array($order->status, ['approved', 'fabricating', 'ready', 'delivered']);
         }
 
-        if ($user->hasPermissionTo('orders.view-own')) {
-            return $user->id === $order->created_by;
+        if ($user->hasPermissionTo('orders.view-own') && $user->id === $order->created_by) {
+            return true;
         }
 
         if ($user->hasPermissionTo('orders.view-site')) {
-            return $user->sites()->where('site_id', $order->site_id)->exists()
-                || $user->managedSites()->where('id', $order->site_id)->exists();
+            if ($user->sites()->where('site_id', $order->site_id)->exists()
+                || $user->managedSites()->where('id', $order->site_id)->exists()) {
+                return true;
+            }
         }
 
         return false;

@@ -62,7 +62,7 @@
             @if($order->status === 'submitted')
                 <form action="{{ route('manager.orders.approve', $order) }}" method="POST" style="display:inline;">
                     @csrf
-                    <button type="submit" class="btn btn-primary" style="background-color: var(--navy);" onclick="return confirm('Approve this order for workshop fabrication?')">
+                    <button type="submit" class="btn btn-primary" style="background-color: var(--navy);" onclick="confirmSubmit(event, 'Approve this order for workshop fabrication?', 'Yes, approve it!')">
                         Approve
                     </button>
                 </form>
@@ -179,8 +179,14 @@
         <div class="list-panel">
             @php
                 $totalQty = $order->items->sum('quantity');
-                $totalArea = $order->items->where('ductType.unit', 'm²')->sum('total_area');
-                $totalLength = $order->items->where('ductType.unit', 'm')->sum('total_area');
+                $ducts = $order->items->filter(function($i) {
+                    return !in_array($i->ductType->formula_key, ['angle_bar', 'angle_bar_u']);
+                });
+                $supports = $order->items->filter(function($i) {
+                    return in_array($i->ductType->formula_key, ['angle_bar', 'angle_bar_u']);
+                });
+                $totalArea = $ducts->sum('total_area');
+                $totalLength = $supports->sum('total_area');
             @endphp
             <div class="stats-row">
                 <div class="stat-card navy-accent">
@@ -240,7 +246,7 @@
                                         </div>
                                         <span class="item-qty">{{ $item->quantity }} nos</span>
                                     </div>
-                                    <div class="item-area">{{ number_format($item->total_area, 2) }}<div class="item-area-unit">{{ $item->ductType->unit }}</div></div>
+                                    <div class="item-area">{{ number_format($item->total_area, 2) }}<div class="item-area-unit">{{ in_array($item->ductType->formula_key, ['angle_bar', 'angle_bar_u']) ? 'm' : 'm²' }}</div></div>
                                 </div>
                             @endforeach
                         @endif

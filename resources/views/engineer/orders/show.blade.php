@@ -62,7 +62,7 @@
             @if($order->status === 'draft' || $order->status === 'rejected')
                 <form action="{{ route('engineer.orders.submit', $order) }}" method="POST" style="display:inline;">
                     @csrf
-                    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit this order?')">
+                    <button type="submit" class="btn btn-primary" onclick="confirmSubmit(event, 'Are you sure you want to submit this order?', 'Yes, submit it!')">
                         Submit Order
                     </button>
                 </form>
@@ -70,7 +70,7 @@
             @if($order->status === 'submitted')
                 <form action="{{ route('engineer.orders.revert', $order) }}" method="POST" style="display:inline;">
                     @csrf
-                    <button type="submit" class="btn btn-secondary" onclick="return confirm('Are you sure you want to revert this order back to draft?')">
+                    <button type="submit" class="btn btn-secondary" onclick="confirmSubmit(event, 'Are you sure you want to revert this order back to draft?', 'Yes, revert it')">
                         Set to Draft
                     </button>
                 </form>
@@ -174,8 +174,14 @@
         <div class="list-panel">
             @php
                 $totalQty = $order->items->sum('quantity');
-                $totalArea = $order->items->where('ductType.unit', 'm²')->sum('total_area');
-                $totalLength = $order->items->where('ductType.unit', 'm')->sum('total_area');
+                $ducts = $order->items->filter(function($i) {
+                    return !in_array($i->ductType->formula_key, ['angle_bar', 'angle_bar_u']);
+                });
+                $supports = $order->items->filter(function($i) {
+                    return in_array($i->ductType->formula_key, ['angle_bar', 'angle_bar_u']);
+                });
+                $totalArea = $ducts->sum('total_area');
+                $totalLength = $supports->sum('total_area');
             @endphp
             <div class="stats-row">
                 <div class="stat-card navy-accent">
@@ -235,7 +241,7 @@
                                         </div>
                                         <span class="item-qty">{{ $item->quantity }} nos</span>
                                     </div>
-                                    <div class="item-area">{{ number_format($item->total_area, 2) }}<div class="item-area-unit">{{ $item->ductType->unit }}</div></div>
+                                    <div class="item-area">{{ number_format($item->total_area, 2) }}<div class="item-area-unit">{{ in_array($item->ductType->formula_key, ['angle_bar', 'angle_bar_u']) ? 'm' : 'm²' }}</div></div>
                                     @if(in_array($order->status, ['draft', 'rejected']))
                                         <form action="{{ route('engineer.orders.items.destroy', [$order, $item]) }}" method="POST" style="margin-left:10px;">
                                             @csrf

@@ -1167,13 +1167,14 @@ select.field-input {
 
 /* ── STATS ROW ── */
 .stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: nowrap;
   gap: 12px;
   margin-bottom: 16px;
 }
 
 .stat-card {
+  flex: 1;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--radius);

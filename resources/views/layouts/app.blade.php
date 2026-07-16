@@ -18,6 +18,31 @@
     <!-- Three.js for viewer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmSubmit(event, message, confirmText = 'Yes, proceed!') {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#1B3F8B',
+                cancelButtonColor: '#D72B2B',
+                confirmButtonText: confirmText,
+                customClass: {
+                    popup: 'swal2-custom-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
+    
     <style>
         .navbar {
             display: flex;
@@ -135,15 +160,35 @@
   </div>
 
   @if(session('success'))
-      <div class="alert alert-success">
-          {{ session('success') }}
-      </div>
+      <script>
+          document.addEventListener('DOMContentLoaded', function() {
+              Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'success',
+                  title: "{{ session('success') }}",
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true
+              });
+          });
+      </script>
   @endif
 
   @if(session('error'))
-      <div class="alert alert-error">
-          {{ session('error') }}
-      </div>
+      <script>
+          document.addEventListener('DOMContentLoaded', function() {
+              Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'error',
+                  title: "{{ session('error') }}",
+                  showConfirmButton: false,
+                  timer: 4000,
+                  timerProgressBar: true
+              });
+          });
+      </script>
   @endif
 
   <!-- MAIN CONTENT -->

@@ -37,6 +37,10 @@ class Order extends Model
     {
         return $this->belongsTo(Order::class, 'revision_of');
     }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
+    }
     public function revisions()
     {
         return $this->hasMany(Order::class, 'revision_of');

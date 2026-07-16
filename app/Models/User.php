@@ -61,4 +61,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Site::class, 'manager_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

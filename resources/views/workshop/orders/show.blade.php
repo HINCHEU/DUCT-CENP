@@ -155,5 +155,7 @@
             @endif
         </div>
     </div>
+    
+    @include('partials.comments')
 </div>
 @endsection

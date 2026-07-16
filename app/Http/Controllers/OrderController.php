@@ -10,13 +10,30 @@ use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $orders = Order::where('created_by', $user->id)
-            ->with(['site', 'items'])
-            ->latest()
-            ->paginate(15);
+        $query = Order::where('created_by', $user->id)->with(['site', 'items']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhereHas('site', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        $orders = $query->latest()->paginate(15)->withQueryString();
             
         return view('engineer.orders.index', compact('orders'));
     }
@@ -58,7 +75,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $this->authorize('view', $order);
-        $order->load(['site', 'items.ductType']);
+        $order->load(['site', 'items.ductType', 'comments.user']);
         $ductTypes = \App\Models\DuctType::all();
         
         return view('engineer.orders.show', compact('order', 'ductTypes'));

@@ -6,8 +6,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding: 16px;
+            margin-bottom: 12px;
+            padding: 8px 16px;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -127,22 +127,24 @@
 
                         <div id="dynamic-fields" class="fields-grid"></div>
 
-                        <div class="qty-row">
-                            <span class="qty-label">Thickness</span>
-                            <select id="thickness-select" name="thickness" class="thickness-select">
-                                <option value="0.6">0.6 mm</option>
-                                <option value="0.8" selected>0.8 mm</option>
-                                <option value="1.0">1.0 mm</option>
-                                <option value="1.2">1.2 mm</option>
-                            </select>
-                        </div>
+                        <div style="display: flex; gap: 20px; align-items: center; margin-top: 10px;">
+                            <div class="qty-row" style="margin-top: 0;">
+                                <span class="qty-label">Thickness</span>
+                                <select id="thickness-select" name="thickness" class="thickness-select">
+                                    <option value="0.6">0.6 mm</option>
+                                    <option value="0.8" selected>0.8 mm</option>
+                                    <option value="1.0">1.0 mm</option>
+                                    <option value="1.2">1.2 mm</option>
+                                </select>
+                            </div>
 
-                        <div class="qty-row">
-                            <span class="qty-label">Quantity</span>
-                            <input type="number" id="qty" name="quantity" class="qty-input" value="1" min="1" oninput="updatePreview()">
-                            <span style="font-size:12px;color:var(--text-muted)">nos</span>
+                            <div class="qty-row" style="margin-top: 0;">
+                                <span class="qty-label">Quantity</span>
+                                <input type="number" id="qty" name="quantity" class="qty-input" value="1" min="1" oninput="updatePreview()">
+                                <span style="font-size:12px;color:var(--text-muted)">nos</span>
+                            </div>
                         </div>
-                        
+<!--                         
                         <div class="qty-row" style="margin-top: 10px;">
                             <label style="display:flex; align-items:center; gap:8px; font-size:14px;">
                                 <input type="checkbox" name="canvas_flange" value="1"> Canvas Flange
@@ -150,7 +152,7 @@
                             <label style="display:flex; align-items:center; gap:8px; font-size:14px;">
                                 <input type="checkbox" name="inner_strut" value="1"> Inner Strut
                             </label>
-                        </div>
+                        </div> -->
 
                         <div id="preview-area" class="preview-box">
                             <div class="preview-muted">Fill dimensions above to preview surface area</div>
@@ -216,7 +218,7 @@
                     </div>
                 </div>
 
-                <div class="card-body" style="flex:1;overflow-y:auto;padding-bottom:0">
+                <div class="card-body" style="flex:1;overflow-y:auto;padding-bottom:0;max-height:550px;">
                     <div id="item-list">
                         @if($order->items->count() === 0)
                             <div class="empty-state">
@@ -228,27 +230,80 @@
                                 <p>No items yet.<br>Select a duct type and add to list.</p>
                             </div>
                         @else
-                            @foreach($order->items as $index => $item)
-                                <div class="item-row">
-                                    <div class="item-num">{{ $index + 1 }}</div>
-                                    <div class="item-info">
-                                        <div class="item-name">{{ $item->ductType->name }}</div>
-                                        <div class="item-dim">
-                                            @foreach($item->dimensions as $k => $v)
-                                                {{ $k }}:{{ $v }}
-                                            @endforeach
-                                            | thickness: {{ $item->thickness }}mm
-                                        </div>
-                                        <span class="item-qty">{{ $item->quantity }} nos</span>
+                            @php
+                                $groupedItems = $order->items->groupBy(function($item) {
+                                    return $item->ductType->name;
+                                });
+                            @endphp
+                            
+                            @foreach($groupedItems as $typeName => $itemsGroup)
+                                @php
+                                    $firstItem = $itemsGroup->first();
+                                    $isLinear = in_array($firstItem->ductType->formula_key, ['angle_bar', 'angle_bar_u']);
+                                    $groupTotalArea = $itemsGroup->sum('total_area');
+                                @endphp
+                                <div class="list-group">
+                                    <div class="list-group-header {{ $isLinear ? 'linear-group' : '' }}">
+                                        <div>{{ $typeName }}</div>
+                                        <div class="group-total">{{ number_format($groupTotalArea, 2) }} {{ $isLinear ? 'm (linear)' : 'm²' }}</div>
                                     </div>
-                                    <div class="item-area">{{ number_format($item->total_area, 2) }}<div class="item-area-unit">{{ in_array($item->ductType->formula_key, ['angle_bar', 'angle_bar_u']) ? 'm' : 'm²' }}</div></div>
-                                    @if(in_array($order->status, ['draft', 'rejected']))
-                                        <form action="{{ route('engineer.orders.items.destroy', [$order, $item]) }}" method="POST" style="margin-left:10px;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-del">✕</button>
-                                        </form>
-                                    @endif
+                                    
+                                    @foreach($itemsGroup as $item)
+                                        <div class="list-item-row">
+                                            <div class="item-main-details">
+                                                <div class="item-dimensions">
+                                                    @foreach($item->dimensions as $k => $v)
+                                                        {{ strtoupper($k) }}:{{ $v }}
+                                                    @endforeach
+                                                </div>
+                                                <div class="item-thickness">
+                                                    @if($isLinear)
+                                                        length only — not m²
+                                                    @else
+                                                        {{ $item->thickness }}mm thickness
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="item-qty-multiplier">
+                                                @if(in_array($order->status, ['draft', 'rejected']))
+                                                    <form action="{{ route('engineer.orders.items.updateQuantity', [$order, $item]) }}" method="POST" style="display:inline; margin:0;">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div style="display:flex; align-items:center;">
+                                                            <span style="color:#8a97b8; margin-right:4px;">×</span>
+                                                            <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" 
+                                                                style="width: 50px; border: 1px solid #dde3f0; border-radius: 4px; padding: 4px 6px; font-size: 14px; text-align: center; color: #0d1a3a; font-weight: 600; outline: none;"
+                                                                onfocus="this.style.borderColor='#1B3F8B'"
+                                                                onblur="this.style.borderColor='#dde3f0'"
+                                                                onchange="this.form.submit()">
+                                                        </div>
+                                                    </form>
+                                                @else
+                                                    ×{{ $item->quantity }}
+                                                @endif
+                                            </div>
+                                            
+                                            <div class="item-final-area">
+                                                {{ number_format($item->total_area, 2) }} {{ $isLinear ? 'm' : 'm²' }}
+                                            </div>
+                                            
+                                            <div class="item-actions">
+                                                <button type="button" class="btn-icon btn-edit" title="Edit" onclick="editItem({{ $item->id }})">
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                </button>
+                                                @if(in_array($order->status, ['draft', 'rejected']))
+                                                    <form action="{{ route('engineer.orders.items.destroy', [$order, $item]) }}" method="POST" style="display:inline; margin:0;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn-icon btn-delete" title="Delete">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             @endforeach
                         @endif
@@ -289,6 +344,8 @@
             </div>
         </div>
     </div>
+    
+    @include('partials.comments')
 </div>
 @endsection
 
@@ -300,6 +357,96 @@
 <script src="{{ asset('ducts.js') }}"></script>
 <script src="{{ asset('viewer.js') }}"></script>
 <script src="{{ asset('app.js') }}"></script>
+<script>
+    const orderItems = @json($order->items->map(function($i) { $i->duct_type_key = $i->ductType->formula_key; return $i; }));
+
+    function editItem(id) {
+        const item = orderItems.find(i => i.id === id);
+        if(!item) return;
+
+        // Change duct type
+        const typeSelect = document.getElementById('duct-type');
+        typeSelect.value = item.duct_type_key;
+        onTypeChange();
+
+        // Fill dimensions
+        if(item.dimensions) {
+            Object.keys(item.dimensions).forEach(k => {
+                const input = document.getElementById('f_' + k);
+                if(input) input.value = item.dimensions[k];
+            });
+        }
+
+        // Fill other fields
+        const thicknessSelect = document.getElementById('thickness-select');
+        if(thicknessSelect) thicknessSelect.value = item.thickness;
+        
+        const qtyInput = document.getElementById('qty');
+        if(qtyInput) qtyInput.value = item.quantity;
+        
+        const canvasCheckbox = document.querySelector('input[name="canvas_flange"]');
+        if(canvasCheckbox) canvasCheckbox.checked = item.canvas_flange == 1;
+        
+        const strutCheckbox = document.querySelector('input[name="inner_strut"]');
+        if(strutCheckbox) strutCheckbox.checked = item.inner_strut == 1;
+        
+        updatePreview();
+
+        // Change form action and UI
+        const form = document.getElementById('add-item-form');
+        form.action = `/engineer/orders/{{ $order->id }}/items/${item.id}`;
+        
+        // Add PUT method hidden field if not exists
+        let methodField = form.querySelector('input[name="_method"]');
+        if(!methodField) {
+            methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            form.appendChild(methodField);
+        }
+        methodField.value = 'PUT';
+
+        // Update submit button
+        const submitBtn = form.querySelector('button[type="button"][onclick="submitItemForm()"]') || form.querySelector('button[type="submit"]');
+        if(submitBtn) submitBtn.textContent = 'Update Item';
+        
+        // Add Cancel button
+        let cancelBtn = document.getElementById('cancel-edit-btn');
+        if(!cancelBtn) {
+            cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.id = 'cancel-edit-btn';
+            cancelBtn.className = 'btn btn-ghost';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.style.marginLeft = '10px';
+            cancelBtn.onclick = cancelEdit;
+            if(submitBtn && submitBtn.parentNode) submitBtn.parentNode.insertBefore(cancelBtn, submitBtn.nextSibling);
+        }
+        if(cancelBtn) cancelBtn.style.display = 'inline-block';
+        
+        // Scroll to form smoothly
+        form.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelEdit() {
+        const form = document.getElementById('add-item-form');
+        form.action = "{{ route('engineer.orders.items.store', $order) }}";
+        
+        const methodField = form.querySelector('input[name="_method"]');
+        if(methodField) methodField.remove();
+        
+        const submitBtn = form.querySelector('button[type="button"][onclick="submitItemForm()"]') || form.querySelector('button[type="submit"]');
+        if(submitBtn) submitBtn.innerHTML = '+ Add to List';
+        
+        const cancelBtn = document.getElementById('cancel-edit-btn');
+        if(cancelBtn) cancelBtn.style.display = 'none';
+        
+        form.reset();
+        const typeSelect = document.getElementById('duct-type');
+        if(typeSelect) typeSelect.selectedIndex = 0;
+        onTypeChange();
+    }
+</script>
 <script>
     // Overriding specific app.js functions for server integration
     function submitItemForm() {

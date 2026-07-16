@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ManagerOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         
@@ -17,11 +17,32 @@ class ManagerOrderController extends Controller
         $managedSiteIds = $user->managedSites()->pluck('id');
         $siteIds = $assignedSiteIds->merge($managedSiteIds)->unique();
         
-        $orders = Order::whereIn('site_id', $siteIds)
+        $query = Order::whereIn('site_id', $siteIds)
             ->whereIn('status', ['submitted', 'approved', 'fabricating', 'ready', 'delivered', 'rejected'])
-            ->with(['site', 'user'])
-            ->latest()
-            ->paginate(15);
+            ->with(['site', 'user']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhereHas('site', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('user', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        $orders = $query->latest()->paginate(15)->withQueryString();
             
         return view('manager.orders.index', compact('orders'));
     }
@@ -29,7 +50,7 @@ class ManagerOrderController extends Controller
     public function show(Order $order)
     {
         $this->authorize('view', $order);
-        $order->load(['site', 'user', 'items.ductType']);
+        $order->load(['site', 'user', 'items.ductType', 'comments.user']);
         $ductTypes = \App\Models\DuctType::all();
         
         return view('manager.orders.show', compact('order', 'ductTypes'));

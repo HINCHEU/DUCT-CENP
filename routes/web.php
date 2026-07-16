@@ -7,6 +7,7 @@ use App\Http\Controllers\ManagerOrderController;
 use App\Http\Controllers\WorkshopOrderController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -18,12 +19,16 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
     
+    // Shared Routes
+    Route::post('orders/{order}/comments', [CommentController::class, 'store'])->name('orders.comments.store');
+    
     // Engineer Routes
     Route::middleware(['role:engineer'])->prefix('engineer')->name('engineer.')->group(function () {
         Route::resource('orders', OrderController::class);
         Route::post('orders/{order}/submit', [OrderController::class, 'submit'])->name('orders.submit');
         Route::post('orders/{order}/revert', [OrderController::class, 'revertToDraft'])->name('orders.revert');
         
+        Route::put('orders/{order}/items/{item}/quantity', [OrderItemController::class, 'updateQuantity'])->name('orders.items.updateQuantity');
         Route::resource('orders.items', OrderItemController::class)->except(['index', 'show']);
     });
     
@@ -37,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
         // Managers can edit items of submitted orders
         Route::get('orders/{order}/items/{item}/edit', [OrderItemController::class, 'editManager'])->name('orders.items.edit');
         Route::put('orders/{order}/items/{item}', [OrderItemController::class, 'updateManager'])->name('orders.items.update');
+        Route::put('orders/{order}/items/{item}/quantity', [OrderItemController::class, 'updateQuantity'])->name('orders.items.updateQuantity');
     });
     
     // Workshop Routes

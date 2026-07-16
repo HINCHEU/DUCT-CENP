@@ -80,14 +80,14 @@ class OrderItemController extends Controller
             'remarks' => $request->remarks,
         ]);
 
-        return redirect()->route('engineer.orders.show', $order)->with('success', 'Item updated.');
+        return redirect()->back()->with('success', 'Item updated.');
     }
 
     public function destroy(Order $order, OrderItem $item)
     {
         $this->authorize('update', $order);
         $item->delete();
-        return redirect()->route('engineer.orders.show', $order)->with('success', 'Item removed.');
+        return redirect()->back()->with('success', 'Item removed.');
     }
     
     // Manager specific update method (if needed separately)
@@ -95,5 +95,23 @@ class OrderItemController extends Controller
     {
         // Managers can also update using authorize('update', $order)
         return $this->update($request, $order, $item, $calculator);
+    }
+    
+    public function updateQuantity(Request $request, Order $order, OrderItem $item)
+    {
+        $this->authorize('update', $order);
+        
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+        
+        $totalArea = $item->surface_area * $request->quantity;
+        
+        $item->update([
+            'quantity' => $request->quantity,
+            'total_area' => $totalArea,
+        ]);
+        
+        return redirect()->back()->with('success', 'Quantity updated.');
     }
 }

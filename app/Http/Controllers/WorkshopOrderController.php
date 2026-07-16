@@ -7,13 +7,31 @@ use Illuminate\Http\Request;
 
 class WorkshopOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Workshop sees all approved and fabricating orders
-        $orders = Order::whereIn('status', ['approved', 'fabricating', 'ready', 'delivered'])
-            ->with(['site', 'user'])
-            ->oldest('requested_delivery_date')
-            ->paginate(15);
+        $query = Order::whereIn('status', ['approved', 'fabricating', 'ready', 'delivered'])
+            ->with(['site', 'user']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhereHas('site', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+
+        $orders = $query->oldest('requested_delivery_date')->paginate(15)->withQueryString();
             
         return view('workshop.orders.index', compact('orders'));
     }
@@ -21,7 +39,7 @@ class WorkshopOrderController extends Controller
     public function show(Order $order)
     {
         $this->authorize('view', $order);
-        $order->load(['site', 'user', 'items.ductType']);
+        $order->load(['site', 'user', 'items.ductType', 'comments.user']);
         
         return view('workshop.orders.show', compact('order'));
     }

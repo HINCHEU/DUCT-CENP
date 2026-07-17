@@ -97,6 +97,11 @@ class OrderItemController extends Controller
         return $this->update($request, $order, $item, $calculator);
     }
     
+    public function storeManager(Request $request, Order $order, DuctAreaCalculator $calculator)
+    {
+        return $this->store($request, $order, $calculator);
+    }
+    
     public function updateQuantity(Request $request, Order $order, OrderItem $item)
     {
         $this->authorize('update', $order);

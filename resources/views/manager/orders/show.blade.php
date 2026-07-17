@@ -59,6 +59,14 @@
             </div>
         </div>
         <div style="display:flex; gap: 10px;">
+            @if($order->status === 'draft')
+                <form action="{{ route('manager.orders.submit', $order) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-primary" style="background-color: var(--navy);" onclick="confirmSubmit(event, 'Submit this order for approval?', 'Yes, submit it!')">
+                        Submit Order
+                    </button>
+                </form>
+            @endif
             @if($order->status === 'submitted')
                 <form action="{{ route('manager.orders.approve', $order) }}" method="POST" style="display:inline;">
                     @csrf
@@ -101,14 +109,11 @@
                     </div>
                 </div>
                 
-                <!-- Disable form if not submitted -->
-                <div class="card-body" @if($order->status !== 'submitted') style="opacity:0.6; pointer-events:none;" @endif>
+                <!-- Disable form if not submitted or draft -->
+                <div class="card-body" @if(!in_array($order->status, ['draft', 'submitted'])) style="opacity:0.6; pointer-events:none;" @endif>
                     
-                    <form id="add-item-form" action="{{ route('manager.orders.items.update', ['order' => $order->id, 'item' => 0]) }}" method="POST">
+                    <form id="add-item-form" action="{{ route('manager.orders.items.store', $order->id) }}" method="POST">
                         @csrf
-                        @method('PUT')
-                        <!-- We will use a script to change action to POST for new items, or PUT to an existing item -->
-                        <!-- Actually, if a manager adds a new item, they need a POST to items.store -->
                         <input type="hidden" name="duct_type_id" id="hidden-duct-type-id" value="">
                         
                         <div class="field-group">
@@ -271,7 +276,7 @@
                                             </div>
                                             
                                             <div class="item-qty-multiplier">
-                                                @if($order->status === 'submitted')
+                                                @if(in_array($order->status, ['draft', 'submitted']))
                                                     <form action="{{ route('manager.orders.items.updateQuantity', [$order, $item]) }}" method="POST" style="display:inline; margin:0;">
                                                         @csrf
                                                         @method('PUT')
@@ -294,7 +299,7 @@
                                             </div>
                                             
                                             <div class="item-actions">
-                                                @if($order->status === 'submitted')
+                                                @if(in_array($order->status, ['draft', 'submitted']))
                                                     <button type="button" class="btn-icon btn-edit" title="Edit" onclick="editItem({{ $item->id }})">
                                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                     </button>
@@ -411,7 +416,10 @@
 
     function cancelEdit() {
         const form = document.getElementById('add-item-form');
-        form.action = "{{ route('manager.orders.items.update', ['order' => $order->id, 'item' => 0]) }}";
+        form.action = "{{ route('manager.orders.items.store', $order->id) }}";
+        
+        let methodField = form.querySelector('input[name="_method"]');
+        if(methodField) methodField.remove();
         
         const submitBtn = form.querySelector('button[type="button"][onclick="submitItemForm()"]') || form.querySelector('button[type="submit"]');
         if(submitBtn) submitBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg> Add / Update Item';

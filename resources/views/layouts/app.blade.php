@@ -47,20 +47,34 @@
         .navbar {
             display: flex;
             background: #fff;
-            padding: 10px 28px;
-            border-bottom: 1px solid #dde3f0;
-            justify-content: space-between;
+            padding: 12px 28px;
+            border-bottom: 1px solid #e2e8f0;
             align-items: center;
         }
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
         .nav-links a {
-            margin-right: 20px;
-            color: #0d1a3a;
+            color: #475569;
             text-decoration: none;
             font-weight: 500;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            transition: all 0.2s ease;
         }
         .nav-links a:hover {
-            color: var(--navy);
+            background: #f1f5f9;
+            color: #0f172a;
         }
+        .nav-links a.active {
+            background: #0f172a;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
+        }
+
         .alert {
             padding: 15px 28px;
             margin-bottom: 0;
@@ -119,7 +133,7 @@
   <!-- HEADER -->
   <div class="header">
     <div class="header-inner">
-      <div class="logo-area">
+      <a href="/" class="logo-area" style="text-decoration: none; color: inherit;">
         <div class="logo-badge">
           <span class="logo-ce">CE</span>
           <span class="logo-amp">&amp;</span>
@@ -130,7 +144,7 @@
           <h1>Corporation</h1>
           <p>optimize your investment</p>
         </div>
-      </div>
+      </a>
       <div class="header-actions" style="display:flex; align-items:center; gap:16px;">
         @auth
             <span style="color:white; font-size:14px;">Welcome, {{ Auth::user()->name }} ({{ Auth::user()->roles->first()->name ?? 'No Role' }})</span>
@@ -143,21 +157,25 @@
     </div>
   </div>
 
+  @if(!request()->is('/'))
   <!-- NAVBAR -->
   <div class="navbar">
       <div class="nav-links">
-          @if(Auth::user()->hasRole('engineer'))
-            <a href="{{ route('engineer.orders.index') }}">My Orders</a>
-            <a href="{{ route('engineer.orders.create') }}">New Order</a>
-          @endif
-          @if(Auth::user()->hasRole('manager'))
-            <a href="{{ route('manager.orders.index') }}">Site Orders</a>
-          @endif
-          @if(Auth::user()->hasRole('workshop'))
-            <a href="{{ route('workshop.orders.index') }}">Workshop Queue</a>
+          @if(Auth::check())
+              @if(Auth::user()->hasRole('engineer') || Auth::user()->hasRole('super_admin'))
+                <a href="{{ route('engineer.orders.index') }}" class="{{ request()->routeIs('engineer.orders.index', 'engineer.orders.show', 'engineer.orders.edit') ? 'active' : '' }}">My Orders</a>
+                <a href="{{ route('engineer.orders.create') }}" class="{{ request()->routeIs('engineer.orders.create') ? 'active' : '' }}">New Order</a>
+              @endif
+              @if(Auth::user()->hasRole('manager') || Auth::user()->hasRole('super_admin'))
+                <a href="{{ route('manager.orders.index') }}" class="{{ request()->routeIs('manager.orders.*') ? 'active' : '' }}">Site Orders</a>
+              @endif
+              @if(Auth::user()->hasRole('workshop') || Auth::user()->hasRole('super_admin'))
+                <a href="{{ route('workshop.orders.index') }}" class="{{ request()->routeIs('workshop.orders.*') ? 'active' : '' }}">Workshop Queue</a>
+              @endif
           @endif
       </div>
   </div>
+  @endif
 
   @if(session('success'))
       <script>

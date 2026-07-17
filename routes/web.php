@@ -42,8 +42,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('orders/{order}', [ManagerOrderController::class, 'show'])->name('orders.show');
         Route::post('orders/{order}/approve', [ManagerOrderController::class, 'approve'])->name('orders.approve');
         Route::post('orders/{order}/reject', [ManagerOrderController::class, 'reject'])->name('orders.reject');
+        Route::post('orders/{order}/submit', [ManagerOrderController::class, 'submit'])->name('orders.submit');
         
-        // Managers can edit items of submitted orders
+        // Managers can edit items of submitted or draft orders
+        Route::post('orders/{order}/items', [OrderItemController::class, 'storeManager'])->name('orders.items.store');
         Route::get('orders/{order}/items/{item}/edit', [OrderItemController::class, 'editManager'])->name('orders.items.edit');
         Route::put('orders/{order}/items/{item}', [OrderItemController::class, 'updateManager'])->name('orders.items.update');
         Route::put('orders/{order}/items/{item}/quantity', [OrderItemController::class, 'updateQuantity'])->name('orders.items.updateQuantity');

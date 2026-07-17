@@ -123,6 +123,7 @@
         <thead>
             <tr>
                 <th>Order No</th>
+                <th>Engineer</th>
                 <th>Site</th>
                 <th>Date</th>
                 <th>Status</th>
@@ -135,6 +136,7 @@
             @forelse($orders as $order)
                 <tr>
                     <td>{{ $order->order_number }}</td>
+                    <td>{{ optional($order->user)->name ?? 'Unknown' }}</td>
                     <td>{{ $order->site->name }}</td>
                     <td>{{ $order->created_at->format('M d, Y') }}</td>
                     <td>
@@ -156,7 +158,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align:center; color:#8a97b8; padding: 30px;">
+                    <td colspan="8" style="text-align:center; color:#8a97b8; padding: 30px;">
                         No orders found. Click "Create New Order" to get started.
                     </td>
                 </tr>

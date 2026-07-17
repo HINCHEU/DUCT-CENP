@@ -13,7 +13,11 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = Order::where('created_by', $user->id)->with(['site', 'items']);
+        $query = Order::with(['site', 'items', 'user']);
+        
+        if (!$user->hasRole('super_admin')) {
+            $query->where('created_by', $user->id);
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;

@@ -12,14 +12,15 @@ class ManagerOrderController extends Controller
     {
         $user = Auth::user();
         
-        // Manager can view submitted and approved orders for their managed and assigned sites
-        $assignedSiteIds = $user->sites()->pluck('site_id');
-        $managedSiteIds = $user->managedSites()->pluck('id');
-        $siteIds = $assignedSiteIds->merge($managedSiteIds)->unique();
-        
-        $query = Order::whereIn('site_id', $siteIds)
-            ->whereIn('status', ['submitted', 'approved', 'fabricating', 'ready', 'delivered', 'rejected'])
+        $query = Order::whereIn('status', ['draft', 'submitted', 'approved', 'fabricating', 'ready', 'delivered', 'rejected'])
             ->with(['site', 'user']);
+
+        if (!$user->hasRole('super_admin')) {
+            $assignedSiteIds = $user->sites()->pluck('site_id');
+            $managedSiteIds = $user->managedSites()->pluck('id');
+            $siteIds = $assignedSiteIds->merge($managedSiteIds)->unique();
+            $query->whereIn('site_id', $siteIds);
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -92,5 +93,22 @@ class ManagerOrderController extends Controller
         ]);
         
         return redirect()->route('manager.orders.index')->with('success', 'Order rejected.');
+    }
+    
+    public function submit(Order $order)
+    {
+        $this->authorize('update', $order);
+        
+        if ($order->status !== 'draft') {
+            return back()->with('error', 'Only draft orders can be submitted.');
+        }
+        
+        if ($order->items()->count() === 0) {
+            return back()->with('error', 'Cannot submit an empty order.');
+        }
+        
+        $order->update(['status' => 'submitted']);
+        
+        return redirect()->route('manager.orders.index')->with('success', 'Order submitted successfully.');
     }
 }

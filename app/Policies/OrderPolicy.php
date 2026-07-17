@@ -57,9 +57,9 @@ class OrderPolicy
             return in_array($order->status, ['draft', 'rejected']);
         }
 
-        // Managers can edit submitted orders for their sites
+        // Managers can edit draft or submitted orders for their sites
         if ($user->hasPermissionTo('orders.edit-site')) {
-            if ($order->status === 'submitted') {
+            if (in_array($order->status, ['draft', 'submitted'])) {
                 return $user->sites()->where('site_id', $order->site_id)->exists()
                     || $user->managedSites()->where('id', $order->site_id)->exists();
             }

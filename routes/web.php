@@ -8,10 +8,14 @@ use App\Http\Controllers\WorkshopOrderController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {
+    if (Auth::check()) {
+        return app(HomeController::class)->index();
+    }
     return redirect()->route('login');
-});
+})->name('home');
 
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login']);

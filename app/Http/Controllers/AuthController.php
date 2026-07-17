@@ -21,19 +21,6 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            
-            $user = Auth::user();
-            
-            if ($user->hasRole('engineer')) {
-                return redirect()->route('engineer.orders.index');
-            } elseif ($user->hasRole('manager')) {
-                return redirect()->route('manager.orders.index');
-            } elseif ($user->hasRole('workshop')) {
-                return redirect()->route('workshop.orders.index');
-            } elseif ($user->hasRole('super_admin') || $user->hasRole('admin')) {
-                return redirect('/admin');
-            }
-
             return redirect()->intended('/');
         }
 

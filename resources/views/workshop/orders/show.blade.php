@@ -69,7 +69,7 @@
             </div>
         </div>
         <div>
-            <a href="{{ route('workshop.orders.report', $order) }}" target="_blank" class="btn btn-secondary">Download Cut List PDF</a>
+            <a href="{{ route('orders.report', $order) }}" target="_blank" class="btn btn-secondary">Download Cut List PDF</a>
         </div>
     </div>
 

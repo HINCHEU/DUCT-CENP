@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Shared Routes
     Route::post('orders/{order}/comments', [CommentController::class, 'store'])->name('orders.comments.store');
+    Route::get('orders/{order}/report', [ReportController::class, 'downloadCutList'])->name('orders.report');
     
     // Engineer Routes
     Route::middleware(['role:engineer'])->prefix('engineer')->name('engineer.')->group(function () {
@@ -56,7 +57,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('orders', [WorkshopOrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [WorkshopOrderController::class, 'show'])->name('orders.show');
         Route::post('orders/{order}/status', [WorkshopOrderController::class, 'updateStatus'])->name('orders.status');
-        Route::get('orders/{order}/report', [ReportController::class, 'downloadCutList'])->name('orders.report');
     });
     
 });

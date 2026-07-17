@@ -59,6 +59,9 @@
             </div>
         </div>
         <div>
+            @if($order->status !== 'draft')
+                <a href="{{ route('orders.report', $order) }}" target="_blank" class="btn btn-secondary" style="margin-right:10px;">Download Cut List PDF</a>
+            @endif
             @if($order->status === 'draft' || $order->status === 'rejected')
                 <form action="{{ route('engineer.orders.submit', $order) }}" method="POST" style="display:inline;">
                     @csrf

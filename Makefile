@@ -27,10 +27,12 @@ install:
 	@echo "==> Installation complete! The app is now live."
 
 update:
+	@bash backup.sh
 	@echo "==> Updating DUCT-CENP..."
 	git pull
 	docker compose up -d --build app
 	docker compose exec app php artisan migrate --force
+	@bash notify_update.sh
 	@echo "==> Update complete!"
 
 backup:

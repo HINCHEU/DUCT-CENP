@@ -34,10 +34,7 @@ update:
 	@echo "==> Update complete!"
 
 backup:
-	@echo "==> Backing up database..."
-	@mkdir -p backups
-	docker compose exec db sh -c 'exec mysqldump -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE"' > backups/backup_$$(date +%Y%m%d_%H%M%S).sql
-	@echo "==> Backup saved in the backups/ directory!"
+	@bash backup.sh
 
 seed:
 	@echo "==> Seeding database..."

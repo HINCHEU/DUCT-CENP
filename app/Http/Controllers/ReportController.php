@@ -14,12 +14,14 @@ class ReportController extends Controller
         
         $order->load(['site', 'user', 'items.ductType']);
         
-        $ducts = $order->items->filter(function($item) {
-            return $item->ductType->unit !== 'm';
+        $linearKeys = ['angle_bar', 'angle_bar_u'];
+
+        $ducts = $order->items->filter(function($item) use ($linearKeys) {
+            return !in_array($item->ductType->formula_key, $linearKeys);
         });
         
-        $supports = $order->items->filter(function($item) {
-            return $item->ductType->unit === 'm';
+        $supports = $order->items->filter(function($item) use ($linearKeys) {
+            return in_array($item->ductType->formula_key, $linearKeys);
         });
         
         $pdf = Pdf::loadView('reports.cutlist', compact('order', 'ducts', 'supports'));

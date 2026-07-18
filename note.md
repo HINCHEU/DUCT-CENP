@@ -1,5 +1,5 @@
 - use dimensionXdimesnion instead of indvividual xx
-- add remark to each order duct
+- add remark to each order duct xx
 - 3 sign on report the last two change to comfirm by workshop
 - add project code name
 - order number should be project code

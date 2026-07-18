@@ -49,12 +49,13 @@
       @php
         $dTot = $ducts->sum('total_area');
         $dQty = $ducts->sum('quantity');
+        $ductsList = $ducts->values();
       @endphp
       <h2>Duct Fabrication List</h2>
       <table>
         <thead>
           <tr>
-            <th>#</th>
+            <th style="width:30px">#</th>
             <th>Duct Type</th>
             <th style="text-align:center">Thickness</th>
             <th>Dimensions</th>
@@ -65,9 +66,9 @@
           </tr>
         </thead>
         <tbody>
-          @foreach($ducts as $index => $it)
+          @foreach($ductsList as $it)
             <tr>
-              <td>{{ $index + 1 }}</td>
+              <td>{{ $loop->iteration }}</td>
               <td>{{ $it->ductType->name }}</td>
               <td style="text-align:center">{{ $it->thickness }} mm</td>
               <td style="font-family:monospace">
@@ -95,12 +96,13 @@
       @php
         $sTot = $supports->sum('total_area');
         $sQty = $supports->sum('quantity');
+        $supportsList = $supports->values();
       @endphp
       <h2>Support Materials List</h2>
       <table>
         <thead>
           <tr>
-            <th>#</th>
+            <th style="width:30px">#</th>
             <th>Support Type</th>
             <th style="text-align:center">Thickness</th>
             <th>Dimensions</th>
@@ -111,9 +113,9 @@
           </tr>
         </thead>
         <tbody>
-          @foreach($supports as $index => $it)
+          @foreach($supportsList as $it)
             <tr>
-              <td>{{ $index + 1 }}</td>
+              <td>{{ $loop->iteration }}</td>
               <td>{{ $it->ductType->name }}</td>
               <td style="text-align:center">{{ $it->thickness }} mm</td>
               <td style="font-family:monospace">
@@ -148,7 +150,7 @@
     @endphp
     <table class="sig-table">
       <tr>
-        <td class="sig-col">
+        <td class="sig-col" style="width:33.33%">
           <div class="sig-title">Prepared By</div>
           <div class="sig-space"></div>
           <div class="sig-details">
@@ -156,28 +158,20 @@
             Date: {{ $order->submitted_at ? $order->submitted_at->format('d/M/Y') : $order->created_at->format('d/M/Y') }}
           </div>
         </td>
-        <td class="sig-col">
-          <div class="sig-title">Checked By</div>
+        <td class="sig-col" style="width:33.33%">
+          <div class="sig-title">approved By</div>
           <div class="sig-space"></div>
           <div class="sig-details">
             Name: <span style="font-size: {{ $aSize }}; white-space: nowrap; letter-spacing: -0.2px;">{{ $aName }}</span><br>
             Date: {{ $order->approved_at ? $order->approved_at->format('d/M/Y') : '' }}
           </div>
         </td>
-        <td class="sig-col">
-          <div class="sig-title">Transported By</div>
+        <td class="sig-col" style="width:33.34%">
+          <div class="sig-title">Confirmed by</div>
           <div class="sig-space"></div>
           <div class="sig-details">
             Name: <br>
-            Date: 
-          </div>
-        </td>
-        <td class="sig-col">
-          <div class="sig-title">Received By</div>
-          <div class="sig-space"></div>
-          <div class="sig-details">
-            Name: <br>
-            Date: 
+            Date:
           </div>
         </td>
       </tr>

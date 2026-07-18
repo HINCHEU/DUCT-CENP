@@ -22,7 +22,9 @@ class OrderPolicy
     public function view(User $user, Order $order): bool
     {
         if ($user->hasRole('workshop')) {
-            return in_array($order->status, ['approved', 'fabricating', 'ready', 'delivered']);
+            if (in_array($order->status, ['approved', 'fabricating', 'ready', 'delivered'])) {
+                return true;
+            }
         }
 
         if ($user->hasPermissionTo('orders.view-own') && $user->id === $order->created_by) {
@@ -54,7 +56,9 @@ class OrderPolicy
     {
         // Engineers can edit their own draft or rejected orders
         if ($user->hasPermissionTo('orders.edit-own') && $user->id === $order->created_by) {
-            return in_array($order->status, ['draft', 'rejected']);
+            if (in_array($order->status, ['draft', 'rejected'])) {
+                return true;
+            }
         }
 
         // Managers can edit draft or submitted orders for their sites
@@ -72,7 +76,9 @@ class OrderPolicy
     {
         // Only engineers can delete their own draft orders
         if ($user->hasPermissionTo('orders.edit-own') && $user->id === $order->created_by) {
-            return $order->status === 'draft';
+            if ($order->status === 'draft') {
+                return true;
+            }
         }
 
         return false;
@@ -84,7 +90,9 @@ class OrderPolicy
     public function revert(User $user, Order $order): bool
     {
         if ($user->hasPermissionTo('orders.edit-own') && $user->id === $order->created_by) {
-            return $order->status === 'submitted';
+            if ($order->status === 'submitted') {
+                return true;
+            }
         }
 
         return false;

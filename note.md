@@ -1,0 +1,6 @@
+- use dimensionXdimesnion instead of indvividual
+- add remark to each order duct
+- 3 sign on report the last two change to comfirm by workshop
+- add project code name
+- order number should be project code
+- ui on workshop item should be like in report

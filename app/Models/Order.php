@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['order_number', 'site_id', 'created_by', 'approved_by', 'status', 'priority', 'notes', 'requested_delivery_date', 'rejection_reason', 'revision_of', 'submitted_at', 'approved_at'];
+    protected $fillable = ['order_number', 'site_id', 'created_by', 'approved_by', 'confirmed_by', 'status', 'priority', 'notes', 'requested_delivery_date', 'rejection_reason', 'revision_of', 'submitted_at', 'approved_at', 'confirmed_at'];
 
     protected function casts(): array
     {
         return [
-            'submitted_at' => 'datetime',
-            'approved_at' => 'datetime',
-            'requested_delivery_date' => 'date',
+            'submitted_at'             => 'datetime',
+            'approved_at'              => 'datetime',
+            'confirmed_at'             => 'datetime',
+            'requested_delivery_date'  => 'date',
         ];
     }
 
@@ -32,6 +33,10 @@ class Order extends Model
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+    public function confirmer()
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
     }
     public function originalOrder()
     {

@@ -12,7 +12,7 @@ class ReportController extends Controller
     {
         $this->authorize('view', $order);
         
-        $order->load(['site', 'user', 'items.ductType']);
+        $order->load(['site', 'user', 'items.ductType', 'confirmer']);
         
         $linearKeys = ['angle_bar', 'angle_bar_u'];
 

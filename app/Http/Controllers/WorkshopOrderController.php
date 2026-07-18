@@ -63,7 +63,15 @@ class WorkshopOrderController extends Controller
             return back()->with('error', 'Invalid status transition.');
         }
         
-        $order->update(['status' => $request->status]);
+        $updateData = ['status' => $request->status];
+
+        // Record who confirmed (started fabrication) — this is the workshop acceptance step
+        if ($request->status === 'fabricating') {
+            $updateData['confirmed_by'] = auth()->id();
+            $updateData['confirmed_at'] = now();
+        }
+
+        $order->update($updateData);
         
         return back()->with('success', 'Order status updated to ' . ucfirst($request->status));
     }

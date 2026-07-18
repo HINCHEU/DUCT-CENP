@@ -147,6 +147,10 @@
       $aName = optional($order->approver)->name ?? '';
       $aLen = strlen($aName);
       $aSize = $aLen > 18 ? '9px' : ($aLen > 14 ? '10px' : '11px');
+
+      $wName = optional($order->confirmer)->name ?? '';
+      $wLen = strlen($wName);
+      $wSize = $wLen > 18 ? '9px' : ($wLen > 14 ? '10px' : '11px');
     @endphp
     <table class="sig-table">
       <tr>
@@ -170,8 +174,8 @@
           <div class="sig-title">Confirmed by</div>
           <div class="sig-space"></div>
           <div class="sig-details">
-            Name: <br>
-            Date:
+            Name: <span style="font-size: {{ $wSize }}; white-space: nowrap; letter-spacing: -0.2px;">{{ $wName }}</span><br>
+            Date: {{ $order->confirmed_at ? $order->confirmed_at->format('d/M/Y') : '' }}
           </div>
         </td>
       </tr>

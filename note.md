@@ -1,6 +1,5 @@
-- use dimensionXdimesnion instead of indvividual xx
-- add remark to each order duct xx
-- 3 sign on report the last two change to comfirm by workshop
-- add project code name
-- order number should be project code
-- ui on workshop item should be like in report
+- use dimensionXdimesnion instead of indvividual done
+- add remark to each order duct done
+- 3 sign on report the last two change to comfirm by workshop done
+- add project when creating site
+- order number should be project code-project-name-00001 (4 digits)

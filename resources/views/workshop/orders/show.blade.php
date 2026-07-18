@@ -92,67 +92,137 @@
     </div>
     @endif
 
-    <div class="card" style="display:flex;flex-direction:column">
+    @php
+        $totalQty = $order->items->sum('quantity');
+        $ductItems = $order->items->filter(fn($i) => !in_array($i->ductType->formula_key, ['angle_bar', 'angle_bar_u']));
+        $supportItems = $order->items->filter(fn($i) => in_array($i->ductType->formula_key, ['angle_bar', 'angle_bar_u']));
+        $totalArea   = $ductItems->sum('total_area');
+        $totalLength = $supportItems->sum('total_area');
+    @endphp
+
+    {{-- Stat cards --}}
+    <div class="stats-row">
+        <div class="stat-card navy-accent">
+            <div class="stat-label">Items</div>
+            <div class="stat-value">{{ $order->items->count() }}</div>
+        </div>
+        <div class="stat-card navy-accent">
+            <div class="stat-label">Total Qty</div>
+            <div class="stat-value">{{ $totalQty }} <span class="stat-unit">nos</span></div>
+        </div>
+        @if($totalArea > 0)
+        <div class="stat-card accent">
+            <div class="stat-label">Total Area</div>
+            <div class="stat-value">{{ number_format($totalArea, 4) }} <span class="stat-unit">m²</span></div>
+        </div>
+        @endif
+        @if($totalLength > 0)
+        <div class="stat-card accent">
+            <div class="stat-label">Total Length</div>
+            <div class="stat-value">{{ number_format($totalLength, 2) }} <span class="stat-unit">m</span></div>
+        </div>
+        @endif
+    </div>
+
+    {{-- Duct Fabrication List --}}
+    @if($ductItems->count() > 0)
+    <div class="card" style="display:flex;flex-direction:column; margin-bottom:20px;">
         <div class="card-header">
             <div class="card-header-left">
                 <div class="card-icon" style="background:var(--red)">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zm0-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zm0-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" /></svg>
                 </div>
-                <span class="card-title">Fabrication List</span>
+                <span class="card-title">Duct Fabrication List</span>
             </div>
         </div>
-
-        <div class="card-body">
-            @php
-                $totalQty = $order->items->sum('quantity');
-                $totalArea = $order->items->where('ductType.unit', 'm²')->sum('total_area');
-                $totalLength = $order->items->where('ductType.unit', 'm')->sum('total_area');
-            @endphp
-            
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Type</th>
-                        <th>Dimensions</th>
-                        <th>Thickness</th>
-                        <th>Qty</th>
-                        <th>Area/Length</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($order->items as $index => $item)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $item->ductType->name }}</td>
-                            <td style="font-family:monospace;">
-                                {{ $item->formatted_dimensions }}
-                            </td>
-                            <td>{{ $item->thickness }} mm</td>
-                            <td>{{ $item->quantity }} nos</td>
-                            <td>{{ number_format($item->total_area, 2) }} {{ $item->ductType->unit }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            
-            @if($order->items->count() > 0)
-            <div class="total-bar" style="margin-top:20px; border-radius:8px;">
-                <div>
-                    <div class="total-label">Grand Total</div>
-                    <div class="total-items">{{ $order->items->count() }} items · {{ $totalQty }} nos</div>
-                </div>
-                <div class="total-value">
-                    @if($totalArea > 0) {{ number_format($totalArea, 4) }} <span class="total-m2">m²</span> @endif
-                    @if($totalArea > 0 && $totalLength > 0) <span style="font-size:16px;color:rgba(255,255,255,0.5);margin:0 10px;">|</span> @endif
-                    @if($totalLength > 0) {{ number_format($totalLength, 2) }} <span class="total-m2">m</span> @endif
-                </div>
+        <div class="card-body" style="flex:1;overflow-y:auto;padding-bottom:0;">
+            <div id="item-list">
+                @php $ductGroups = $ductItems->groupBy(fn($i) => $i->ductType->name); @endphp
+                @foreach($ductGroups as $typeName => $group)
+                    @php
+                        $groupTotal = $group->sum('total_area');
+                    @endphp
+                    <div class="list-group">
+                        <div class="list-group-header">
+                            <div>{{ $typeName }}</div>
+                            <div class="group-total">{{ number_format($groupTotal, 2) }} m²</div>
+                        </div>
+                        @foreach($group as $item)
+                            <div class="list-item-row">
+                                <div class="item-main-details">
+                                    <div class="item-dimensions" style="font-family:monospace;">{{ $item->formatted_dimensions }}</div>
+                                    <div class="item-thickness">{{ $item->thickness }}mm thickness</div>
+                                    @if($item->remarks)
+                                        <div style="font-size:11px; color:#1B3F8B; margin-top:2px; font-style:italic;">&#128221; {{ $item->remarks }}</div>
+                                    @endif
+                                </div>
+                                <div class="item-qty-multiplier">×{{ $item->quantity }}</div>
+                                <div class="item-final-area">{{ number_format($item->total_area, 2) }} m²</div>
+                                <div class="item-actions"></div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
             </div>
-            @endif
+        </div>
+        <div class="total-bar">
+            <div>
+                <div class="total-label">Duct Total</div>
+                <div class="total-items">{{ $ductItems->count() }} items · {{ $ductItems->sum('quantity') }} nos</div>
+            </div>
+            <div class="total-value">{{ number_format($totalArea, 4) }} <span class="total-m2">m²</span></div>
         </div>
     </div>
+    @endif
+
+    {{-- Support Materials List --}}
+    @if($supportItems->count() > 0)
+    <div class="card" style="display:flex;flex-direction:column; margin-bottom:20px;">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon" style="background:#3730a3">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-7 14H8v-2h4v2zm4-4H8v-2h8v2zm0-4H8V7h8v2z" /></svg>
+                </div>
+                <span class="card-title">Support Materials List</span>
+            </div>
+        </div>
+        <div class="card-body" style="flex:1;overflow-y:auto;padding-bottom:0;">
+            <div>
+                @php $supportGroups = $supportItems->groupBy(fn($i) => $i->ductType->name); @endphp
+                @foreach($supportGroups as $typeName => $group)
+                    @php $groupTotal = $group->sum('total_area'); @endphp
+                    <div class="list-group">
+                        <div class="list-group-header linear-group">
+                            <div>{{ $typeName }}</div>
+                            <div class="group-total">{{ number_format($groupTotal, 2) }} m (linear)</div>
+                        </div>
+                        @foreach($group as $item)
+                            <div class="list-item-row">
+                                <div class="item-main-details">
+                                    <div class="item-dimensions" style="font-family:monospace;">{{ $item->formatted_dimensions }}</div>
+                                    <div class="item-thickness">length only — not m²</div>
+                                    @if($item->remarks)
+                                        <div style="font-size:11px; color:#1B3F8B; margin-top:2px; font-style:italic;">&#128221; {{ $item->remarks }}</div>
+                                    @endif
+                                </div>
+                                <div class="item-qty-multiplier">×{{ $item->quantity }}</div>
+                                <div class="item-final-area">{{ number_format($item->total_area, 2) }} m</div>
+                                <div class="item-actions"></div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        <div class="total-bar">
+            <div>
+                <div class="total-label">Support Total</div>
+                <div class="total-items">{{ $supportItems->count() }} items · {{ $supportItems->sum('quantity') }} nos</div>
+            </div>
+            <div class="total-value">{{ number_format($totalLength, 2) }} <span class="total-m2">m</span></div>
+        </div>
+    </div>
+    @endif
     
     @include('partials.comments')
 </div>

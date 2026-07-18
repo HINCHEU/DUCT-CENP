@@ -128,9 +128,7 @@
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $item->ductType->name }}</td>
                             <td style="font-family:monospace;">
-                                @foreach($item->dimensions as $k => $v)
-                                    {{ $k }}:{{ $v }}
-                                @endforeach
+                                {{ $item->formatted_dimensions }}
                             </td>
                             <td>{{ $item->thickness }} mm</td>
                             <td>{{ $item->quantity }} nos</td>

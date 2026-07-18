@@ -254,10 +254,8 @@
                                     @foreach($itemsGroup as $item)
                                         <div class="list-item-row">
                                             <div class="item-main-details">
-                                                <div class="item-dimensions">
-                                                    @foreach($item->dimensions as $k => $v)
-                                                        {{ strtoupper($k) }}:{{ $v }}
-                                                    @endforeach
+                                                <div class="item-dimensions" style="font-family: monospace;">
+                                                    {{ $item->formatted_dimensions }}
                                                 </div>
                                                 <div class="item-thickness">
                                                     @if($isLinear)

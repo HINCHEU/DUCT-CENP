@@ -1,4 +1,4 @@
-- use dimensionXdimesnion instead of indvividual
+- use dimensionXdimesnion instead of indvividual xx
 - add remark to each order duct
 - 3 sign on report the last two change to comfirm by workshop
 - add project code name

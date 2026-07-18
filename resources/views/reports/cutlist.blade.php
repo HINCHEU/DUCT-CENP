@@ -70,9 +70,7 @@
               <td>{{ $it->ductType->name }}</td>
               <td style="text-align:center">{{ $it->thickness }} mm</td>
               <td style="font-family:monospace">
-                @foreach($it->dimensions as $k => $v)
-                    {{ $k }}:{{ $v }}
-                @endforeach
+                {{ $it->formatted_dimensions }}
               </td>
               <td style="text-align:center">{{ $it->quantity }}</td>
               <td style="text-align:right">{{ number_format($it->surface_area, 2) }}</td>
@@ -116,9 +114,7 @@
               <td>{{ $it->ductType->name }}</td>
               <td style="text-align:center">{{ $it->thickness }} mm</td>
               <td style="font-family:monospace">
-                @foreach($it->dimensions as $k => $v)
-                    {{ $k }}:{{ $v }}
-                @endforeach
+                {{ $it->formatted_dimensions }}
               </td>
               <td style="text-align:center">{{ $it->quantity }}</td>
               <td style="text-align:right">{{ number_format($it->surface_area, 2) }}</td>

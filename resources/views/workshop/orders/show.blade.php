@@ -150,7 +150,10 @@
                         @foreach($group as $item)
                             <div class="list-item-row">
                                 <div class="item-main-details">
-                                    <div class="item-dimensions" style="font-family:monospace;">{{ $item->formatted_dimensions }}</div>
+                                    <div class="item-dimensions" style="font-family:monospace;">
+                                        <span style="color:#8a97b8; font-size:11px; margin-right:4px;">{{ $loop->iteration }}.</span>
+                                        {{ $item->formatted_dimensions }}
+                                    </div>
                                     <div class="item-thickness">{{ $item->thickness }}mm thickness</div>
                                     @if($item->remarks)
                                         <div style="font-size:11px; color:#1B3F8B; margin-top:2px; font-style:italic;">&#128221; {{ $item->remarks }}</div>
@@ -199,7 +202,10 @@
                         @foreach($group as $item)
                             <div class="list-item-row">
                                 <div class="item-main-details">
-                                    <div class="item-dimensions" style="font-family:monospace;">{{ $item->formatted_dimensions }}</div>
+                                    <div class="item-dimensions" style="font-family:monospace;">
+                                        <span style="color:#8a97b8; font-size:11px; margin-right:4px;">{{ $loop->iteration }}.</span>
+                                        {{ $item->formatted_dimensions }}
+                                    </div>
                                     <div class="item-thickness">length only — not m²</div>
                                     @if($item->remarks)
                                         <div style="font-size:11px; color:#1B3F8B; margin-top:2px; font-style:italic;">&#128221; {{ $item->remarks }}</div>

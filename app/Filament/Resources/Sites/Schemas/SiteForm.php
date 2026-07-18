@@ -14,6 +14,9 @@ class SiteForm
             ->components([
                 TextInput::make('name')
                     ->required(),
+                TextInput::make('project_code')
+                    ->label('Project Code')
+                    ->required(),
                 Select::make('manager_id')
                     ->relationship('manager', 'name')
                     ->searchable()

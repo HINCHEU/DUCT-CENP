@@ -328,6 +328,7 @@
                                         <div class="list-item-row">
                                             <div class="item-main-details">
                                                 <div class="item-dimensions" style="font-family: monospace;">
+                                                    <span style="color:#8a97b8; font-size:11px; margin-right:4px;">{{ $loop->iteration }}.</span>
                                                     {{ $item->formatted_dimensions }}
                                                 </div>
                                                 <div class="item-thickness">

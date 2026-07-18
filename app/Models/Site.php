@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Site extends Model
 {
-    protected $fillable = ['name', 'manager_id'];
+    protected $fillable = ['name', 'manager_id', 'project_code'];
 
     public function manager()
     {

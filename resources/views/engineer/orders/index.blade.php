@@ -122,6 +122,7 @@
     <table class="data-table">
         <thead>
             <tr>
+                <th style="width: 40px">#</th>
                 <th>Order No</th>
                 <th>Engineer</th>
                 <th>Site</th>
@@ -135,6 +136,7 @@
         <tbody>
             @forelse($orders as $order)
                 <tr>
+                    <td>{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}</td>
                     <td>{{ $order->order_number }}</td>
                     <td>{{ optional($order->user)->name ?? 'Unknown' }}</td>
                     <td>{{ $order->site->name }}</td>
@@ -158,7 +160,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" style="text-align:center; color:#8a97b8; padding: 30px;">
+                    <td colspan="9" style="text-align:center; color:#8a97b8; padding: 30px;">
                         No orders found. Click "Create New Order" to get started.
                     </td>
                 </tr>

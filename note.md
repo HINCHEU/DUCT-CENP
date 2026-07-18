@@ -1,5 +1,5 @@
 - use dimensionXdimesnion instead of indvividual done
 - add remark to each order duct done
 - 3 sign on report the last two change to comfirm by workshop done
-- add project when creating site
-- order number should be project code-project-name-00001 (4 digits)
+- add project code when creating site
+- order number should be project code-project-name-0000(number) (4 digits)

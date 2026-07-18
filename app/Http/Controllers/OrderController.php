@@ -37,7 +37,7 @@ class OrderController extends Controller
             $query->where('priority', $request->priority);
         }
 
-        $orders = $query->latest()->paginate(15)->withQueryString();
+        $orders = $query->oldest()->paginate(15)->withQueryString();
             
         return view('engineer.orders.index', compact('orders'));
     }
@@ -63,8 +63,18 @@ class OrderController extends Controller
             abort(403, 'You do not have access to this site.');
         }
 
+        $site = Site::findOrFail($request->site_id);
+        
+        $projectCode = $site->project_code ?: 'P000';
+        $projectName = Str::slug($site->name);
+        
+        $count = Order::where('site_id', $site->id)->count();
+        $sequence = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+        
+        $orderNumber = "{$projectCode}-{$projectName}-{$sequence}";
+
         $order = Order::create([
-            'order_number' => 'ORD-' . strtoupper(Str::random(8)),
+            'order_number' => $orderNumber,
             'site_id' => $request->site_id,
             'created_by' => $user->id,
             'status' => 'draft',

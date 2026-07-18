@@ -116,6 +116,7 @@
     <table class="data-table">
         <thead>
             <tr>
+                <th style="width: 40px">#</th>
                 <th>Order No</th>
                 <th>Site</th>
                 <th>Delivery Date</th>
@@ -128,6 +129,7 @@
         <tbody>
             @forelse($orders as $order)
                 <tr>
+                    <td>{{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}</td>
                     <td>{{ $order->order_number }}</td>
                     <td>{{ $order->site->name }}</td>
                     <td>{{ $order->requested_delivery_date ? $order->requested_delivery_date->format('M d, Y') : 'TBD' }}</td>
@@ -150,7 +152,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align:center; color:#8a97b8; padding: 30px;">
+                    <td colspan="8" style="text-align:center; color:#8a97b8; padding: 30px;">
                         No orders in the queue.
                     </td>
                 </tr>

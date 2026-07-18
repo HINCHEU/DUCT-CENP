@@ -17,6 +17,9 @@ class SitesTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
+                TextColumn::make('project_code')
+                    ->label('Project Code')
+                    ->searchable(),
                 TextColumn::make('manager.name')
                     ->label('Manager')
                     ->sortable(),

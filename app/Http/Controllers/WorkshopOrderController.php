@@ -31,7 +31,7 @@ class WorkshopOrderController extends Controller
             $query->where('priority', $request->priority);
         }
 
-        $orders = $query->oldest('requested_delivery_date')->paginate(15)->withQueryString();
+        $orders = $query->oldest()->paginate(15)->withQueryString();
             
         return view('workshop.orders.index', compact('orders'));
     }

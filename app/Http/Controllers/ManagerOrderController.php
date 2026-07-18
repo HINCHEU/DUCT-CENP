@@ -43,7 +43,7 @@ class ManagerOrderController extends Controller
             $query->where('priority', $request->priority);
         }
 
-        $orders = $query->latest()->paginate(15)->withQueryString();
+        $orders = $query->oldest()->paginate(15)->withQueryString();
             
         return view('manager.orders.index', compact('orders'));
     }

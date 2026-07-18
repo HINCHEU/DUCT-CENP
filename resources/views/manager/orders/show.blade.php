@@ -216,14 +216,14 @@
                             </div>
                         </div>
                         
-                        <div class="qty-row" style="margin-top: 10px;">
+                        <!-- <div class="qty-row" style="margin-top: 10px;">
                             <label style="display:flex; align-items:center; gap:8px; font-size:14px;">
                                 <input type="checkbox" name="canvas_flange" value="1"> Canvas Flange
                             </label>
                             <label style="display:flex; align-items:center; gap:8px; font-size:14px;">
                                 <input type="checkbox" name="inner_strut" value="1"> Inner Strut
                             </label>
-                        </div>
+                        </div> -->
 
                         <div id="preview-area" class="preview-box">
                             <div class="preview-muted">Fill dimensions above to preview surface area</div>

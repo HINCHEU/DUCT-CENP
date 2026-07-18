@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('orders/{order}/revert', [OrderController::class, 'revertToDraft'])->name('orders.revert');
         
         Route::put('orders/{order}/items/{item}/quantity', [OrderItemController::class, 'updateQuantity'])->name('orders.items.updateQuantity');
+        Route::patch('orders/{order}/items/{item}/remark', [OrderItemController::class, 'updateRemark'])->name('orders.items.updateRemark');
         Route::resource('orders.items', OrderItemController::class)->except(['index', 'show']);
     });
     
@@ -50,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('orders/{order}/items/{item}/edit', [OrderItemController::class, 'editManager'])->name('orders.items.edit');
         Route::put('orders/{order}/items/{item}', [OrderItemController::class, 'updateManager'])->name('orders.items.update');
         Route::put('orders/{order}/items/{item}/quantity', [OrderItemController::class, 'updateQuantity'])->name('orders.items.updateQuantity');
+        Route::patch('orders/{order}/items/{item}/remark', [OrderItemController::class, 'updateRemark'])->name('orders.items.updateRemark');
     });
     
     // Workshop Routes

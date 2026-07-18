@@ -58,6 +58,7 @@
             <th>Duct Type</th>
             <th style="text-align:center">Thickness</th>
             <th>Dimensions</th>
+            <th>Description</th>
             <th style="text-align:center">Qty</th>
             <th style="text-align:right">Area/unit (m²)</th>
             <th style="text-align:right">Total (m²)</th>
@@ -72,6 +73,7 @@
               <td style="font-family:monospace">
                 {{ $it->formatted_dimensions }}
               </td>
+              <td style="font-size:11px; color:#444; font-style:{{ $it->remarks ? 'italic' : 'normal' }}">{{ $it->remarks ?? '—' }}</td>
               <td style="text-align:center">{{ $it->quantity }}</td>
               <td style="text-align:right">{{ number_format($it->surface_area, 2) }}</td>
               <td style="text-align:right;font-weight:700">{{ number_format($it->total_area, 2) }}</td>
@@ -80,7 +82,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="4">Total Ducts</td>
+            <td colspan="5">Total Ducts</td>
             <td style="text-align:center;color:#fff">{{ $dQty }} nos</td>
             <td></td>
             <td style="text-align:right;color:#fff;font-size:14px">{{ number_format($dTot, 2) }} m²</td>
@@ -102,6 +104,7 @@
             <th>Support Type</th>
             <th style="text-align:center">Thickness</th>
             <th>Dimensions</th>
+            <th>Description</th>
             <th style="text-align:center">Qty</th>
             <th style="text-align:right">Length/unit (m)</th>
             <th style="text-align:right">Total (m)</th>
@@ -116,6 +119,7 @@
               <td style="font-family:monospace">
                 {{ $it->formatted_dimensions }}
               </td>
+              <td style="font-size:11px; color:#444; font-style:{{ $it->remarks ? 'italic' : 'normal' }}">{{ $it->remarks ?? '—' }}</td>
               <td style="text-align:center">{{ $it->quantity }}</td>
               <td style="text-align:right">{{ number_format($it->surface_area, 2) }}</td>
               <td style="text-align:right;font-weight:700">{{ number_format($it->total_area, 2) }}</td>
@@ -124,7 +128,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="4">Total Supports</td>
+            <td colspan="5">Total Supports</td>
             <td style="text-align:center;color:#fff">{{ $sQty }} nos</td>
             <td></td>
             <td style="text-align:right;color:#fff;font-size:14px">{{ number_format($sTot, 2) }} m</td>

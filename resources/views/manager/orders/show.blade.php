@@ -31,6 +31,64 @@
             color: #0d1a3a;
             font-weight: 500;
         }
+        /* Remark inline popover */
+        .remark-popover {
+            position: fixed;
+            z-index: 9999;
+            background: #fff;
+            border: 1.5px solid #1B3F8B;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(27,63,139,0.18);
+            padding: 12px;
+            width: 260px;
+            animation: remarkFadeIn 0.15s ease;
+        }
+        @keyframes remarkFadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .remark-popover textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #dde3f0;
+            border-radius: 6px;
+            padding: 7px 9px;
+            font-size: 12px;
+            resize: vertical;
+            min-height: 64px;
+            outline: none;
+            color: #0d1a3a;
+            font-family: inherit;
+            transition: border-color 0.15s;
+        }
+        .remark-popover textarea:focus { border-color: #1B3F8B; }
+        .remark-popover-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1B3F8B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .remark-popover-btns {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            justify-content: flex-end;
+        }
+        .remark-popover-btns button {
+            padding: 4px 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .remark-btn-save   { background: #1B3F8B; color: #fff; }
+        .remark-btn-save:hover { background: #14317a; }
+        .remark-btn-cancel { background: #f0f3fa; color: #555; }
+        .remark-btn-cancel:hover { background: #e0e5f0; }
+        .item-remark-display:hover .remark-edit-icon { opacity: 1 !important; }
     </style>
 @endpush
 
@@ -171,6 +229,11 @@
                             <div class="preview-muted">Fill dimensions above to preview surface area</div>
                         </div>
 
+                        <div class="field-group" style="margin-top: 10px;">
+                            <label class="field-label" for="remarks-input">Remark <span style="color:#8a97b8;font-weight:400;">(optional)</span></label>
+                            <textarea id="remarks-input" name="remarks" rows="2" class="field-input" placeholder="e.g. Install near AHU-1, painted black..." style="resize:vertical; min-height:52px; font-size:13px;"></textarea>
+                        </div>
+
                         <div class="btn-row">
                             <button type="button" class="btn btn-primary" onclick="submitItemForm()">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
@@ -274,6 +337,24 @@
                                                         {{ $item->thickness }}mm thickness
                                                     @endif
                                                 </div>
+                                                @if($item->remarks)
+                                                    <div class="item-remark-display" data-item-id="{{ $item->id }}"
+                                                         data-remark-url="{{ route('manager.orders.items.updateRemark', [$order, $item]) }}"
+                                                         title="Click to edit remark"
+                                                         style="font-size:11px; color:#1B3F8B; margin-top:3px; font-style:italic; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                                        <span>&#128221;</span>
+                                                        <span class="remark-text">{{ $item->remarks }}</span>
+                                                        <svg class="remark-edit-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1B3F8B" stroke-width="2.5" style="opacity:0.4; flex-shrink:0;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                    </div>
+                                                @else
+                                                    <div class="item-remark-display item-remark-empty" data-item-id="{{ $item->id }}"
+                                                         data-remark-url="{{ route('manager.orders.items.updateRemark', [$order, $item]) }}"
+                                                         title="Click to add remark"
+                                                         style="font-size:11px; color:#b0bad4; margin-top:3px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b0bad4" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                        <span class="remark-text">Add remark&hellip;</span>
+                                                    </div>
+                                                @endif
                                             </div>
                                             
                                             <div class="item-qty-multiplier">
@@ -374,6 +455,9 @@
         
         const strutCheckbox = document.querySelector('input[name="inner_strut"]');
         if(strutCheckbox) strutCheckbox.checked = item.inner_strut == 1;
+
+        const remarksInput = document.getElementById('remarks-input');
+        if(remarksInput) remarksInput.value = item.remarks || '';
         
         updatePreview();
 
@@ -485,5 +569,113 @@
         if (key === 'butterfly_rect') return '{{ asset('duct/BUTTERFLY%20DUCT.png') }}';
         return '{{ asset('duct/y-duct.png') }}';
     }
+</script>
+<script>
+    // ── Inline remark popover ──────────────────────────────────────────
+    (function() {
+        let activePopover = null;
+
+        function closePopover() {
+            if (activePopover) {
+                activePopover.remove();
+                activePopover = null;
+            }
+        }
+
+        function openRemarkPopover(trigger) {
+            closePopover();
+
+            const url     = trigger.dataset.remarkUrl;
+            const current = trigger.querySelector('.remark-text');
+            const isEmpty = trigger.classList.contains('item-remark-empty');
+            const currentVal = isEmpty ? '' : (current ? current.textContent.trim() : '');
+
+            const pop = document.createElement('div');
+            pop.className = 'remark-popover';
+            pop.innerHTML = `
+                <div class="remark-popover-label">&#128221; Remark</div>
+                <textarea id="remark-ta" placeholder="e.g. Install near AHU-1, painted black..." maxlength="500">${currentVal}</textarea>
+                <div class="remark-popover-btns">
+                    <button class="remark-btn-cancel" type="button">Cancel</button>
+                    <button class="remark-btn-save"   type="button">Save</button>
+                </div>`;
+
+            document.body.appendChild(pop);
+            activePopover = pop;
+
+            // Position below the trigger
+            const rect = trigger.getBoundingClientRect();
+            let top  = rect.bottom + 6 + window.scrollY;
+            let left = rect.left   + window.scrollX;
+            if (left + 260 > window.innerWidth - 8) left = window.innerWidth - 268;
+            pop.style.top  = top  + 'px';
+            pop.style.left = left + 'px';
+
+            const ta = pop.querySelector('#remark-ta');
+            ta.focus();
+            ta.setSelectionRange(ta.value.length, ta.value.length);
+
+            pop.querySelector('.remark-btn-cancel').onclick = closePopover;
+
+            pop.querySelector('.remark-btn-save').onclick = function() {
+                const newVal = ta.value.trim();
+                const saveBtn = this;
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving…';
+
+                fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ remarks: newVal })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        if (newVal) {
+                            trigger.classList.remove('item-remark-empty');
+                            trigger.style.color = '#1B3F8B';
+                            trigger.style.fontStyle = 'italic';
+                            trigger.title = 'Click to edit remark';
+                            trigger.innerHTML = `<span>&#128221;</span><span class="remark-text">${newVal}</span><svg class="remark-edit-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1B3F8B" stroke-width="2.5" style="opacity:0.4;flex-shrink:0;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+                        } else {
+                            trigger.classList.add('item-remark-empty');
+                            trigger.style.color = '#b0bad4';
+                            trigger.style.fontStyle = 'normal';
+                            trigger.title = 'Click to add remark';
+                            trigger.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#b0bad4" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg><span class="remark-text">Add remark…</span>`;
+                        }
+                        closePopover();
+                    }
+                })
+                .catch(() => {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                    alert('Failed to save remark.');
+                });
+            };
+
+            // Keyboard: Ctrl+Enter saves, Escape closes
+            ta.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') { closePopover(); }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    pop.querySelector('.remark-btn-save').click();
+                }
+            });
+        }
+
+        // Delegate click on all remark displays
+        document.addEventListener('click', function(e) {
+            if (activePopover && !activePopover.contains(e.target)) {
+                closePopover();
+                return;
+            }
+            const trigger = e.target.closest('.item-remark-display');
+            if (trigger) openRemarkPopover(trigger);
+        });
+    })();
 </script>
 @endpush

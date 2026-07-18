@@ -442,11 +442,11 @@ function updateStats() {
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
   const totalArea = items.filter(i => i.unit !== 'm').reduce((s, i) => s + i.area * i.qty, 0);
   const totalLength = items.filter(i => i.unit === 'm').reduce((s, i) => s + i.area * i.qty, 0);
-  
+
   document.getElementById('stat-items').textContent = count;
   document.getElementById('stat-qty').innerHTML = `${totalQty} <span class="stat-unit">nos</span>`;
   document.getElementById('stat-area').innerHTML = `${totalArea.toFixed(2)} <span class="stat-unit">m²</span>`;
-  
+
   const lenCard = document.getElementById('stat-length-card');
   if (lenCard) {
     if (totalLength > 0) {
@@ -492,7 +492,7 @@ function renderList() {
   el.innerHTML = html;
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
   document.getElementById('total-items-label').textContent = `${items.length} items · ${totalQty} nos`;
-  
+
   let totalHtml = '';
   if (totalArea > 0) totalHtml += `${totalArea.toFixed(2)} <span class="total-m2">m²</span>`;
   if (totalArea > 0 && totalLength > 0) totalHtml += ` <span style="font-size:16px;color:rgba(255,255,255,0.5);margin:0 10px;">|</span> `;
@@ -512,10 +512,10 @@ function exportCSV() {
   if (!items.length) { alert('No items to export.'); return; }
   let csv = 'No,Category,Type,Thickness (mm),Dimensions,Qty,Value per unit,Total value,Unit\n';
   items.forEach((it, i) => csv += `${i + 1},"${it.category || 'Duct'}","${it.label}",${it.thickness || '0.8'},"${it.dim}",${it.qty},${it.area.toFixed(2)},${(it.area * it.qty).toFixed(2)},${it.unit}\n`);
-  const totA = items.filter(i=>i.unit !== 'm').reduce((s, i) => s + i.area * i.qty, 0);
-  const totL = items.filter(i=>i.unit === 'm').reduce((s, i) => s + i.area * i.qty, 0);
-  if(totA > 0) csv += `,,,,Grand Total Area,,,${totA.toFixed(2)},m2\n`;
-  if(totL > 0) csv += `,,,,Grand Total Length,,,${totL.toFixed(2)},m\n`;
+  const totA = items.filter(i => i.unit !== 'm').reduce((s, i) => s + i.area * i.qty, 0);
+  const totL = items.filter(i => i.unit === 'm').reduce((s, i) => s + i.area * i.qty, 0);
+  if (totA > 0) csv += `,,,,Grand Total Area,,,${totA.toFixed(2)},m2\n`;
+  if (totL > 0) csv += `,,,,Grand Total Length,,,${totL.toFixed(2)},m\n`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
   a.download = 'CEP_duct_fabrication.csv';
@@ -527,7 +527,7 @@ function exportCSV() {
  */
 function exportPrint() {
   if (!items.length) { alert('No items to export.'); return; }
-  
+
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
   const ducts = items.filter(i => i.unit !== 'm');
   const supports = items.filter(i => i.unit === 'm');

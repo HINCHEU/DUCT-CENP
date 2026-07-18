@@ -119,4 +119,17 @@ class OrderItemController extends Controller
         
         return redirect()->back()->with('success', 'Quantity updated.');
     }
+
+    public function updateRemark(Request $request, Order $order, OrderItem $item)
+    {
+        $this->authorize('update', $order);
+
+        $request->validate([
+            'remarks' => 'nullable|string|max:500',
+        ]);
+
+        $item->update(['remarks' => $request->remarks]);
+
+        return response()->json(['success' => true, 'remarks' => $item->remarks]);
+    }
 }

@@ -59,7 +59,7 @@
             <th>Duct Type</th>
             <th style="text-align:center">Thickness</th>
             <th>Dimensions</th>
-            <th>Description</th>
+            <th>Remarks</th>
             <th style="text-align:center">Qty</th>
             <th style="text-align:right">Area/unit (m²)</th>
             <th style="text-align:right">Total (m²)</th>
@@ -106,7 +106,7 @@
             <th>Support Type</th>
             <th style="text-align:center">Thickness</th>
             <th>Dimensions</th>
-            <th>Description</th>
+            <th>Remarks</th>
             <th style="text-align:center">Qty</th>
             <th style="text-align:right">Length/unit (m)</th>
             <th style="text-align:right">Total (m)</th>

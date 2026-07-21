@@ -14,6 +14,7 @@ class DuctTypeInfolist
                 TextEntry::make('name'),
                 TextEntry::make('formula_key'),
                 TextEntry::make('config')
+                    ->formatStateUsing(fn ($state) => is_array($state) || is_object($state) ? new \Illuminate\Support\HtmlString('<pre style="white-space: pre-wrap; font-size: 13px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 6px;">' . json_encode($state, JSON_PRETTY_PRINT) . '</pre>') : $state)
                     ->columnSpanFull(),
                 TextEntry::make('created_at')
                     ->dateTime()

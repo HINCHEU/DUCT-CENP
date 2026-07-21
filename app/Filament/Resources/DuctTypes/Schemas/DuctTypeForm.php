@@ -17,6 +17,8 @@ class DuctTypeForm
                 TextInput::make('formula_key')
                     ->required(),
                 Textarea::make('config')
+                    ->formatStateUsing(fn ($state) => is_string($state) ? $state : json_encode($state, JSON_PRETTY_PRINT))
+                    ->dehydrateStateUsing(fn ($state) => is_string($state) ? json_decode($state, true) : $state)
                     ->required()
                     ->columnSpanFull(),
             ]);

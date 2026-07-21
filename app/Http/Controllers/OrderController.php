@@ -65,8 +65,8 @@ class OrderController extends Controller
 
         $site = Site::findOrFail($request->site_id);
         
-        $projectCode = $site->project_code ?: 'P000';
-        $projectName = Str::slug($site->name);
+        $projectCode = strtoupper($site->project_code ?: 'P000');
+        $projectName = strtoupper(Str::slug($site->name));
         
         $count = Order::where('site_id', $site->id)->count();
         $sequence = str_pad($count + 1, 4, '0', STR_PAD_LEFT);

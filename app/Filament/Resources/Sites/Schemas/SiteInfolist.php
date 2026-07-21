@@ -24,6 +24,11 @@ class SiteInfolist
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
+                TextEntry::make('users.name')
+                    ->label('Assigned People')
+                    ->listWithLineBreaks()
+                    ->bulleted()
+                    ->placeholder('No people assigned yet.'),
             ]);
     }
 }

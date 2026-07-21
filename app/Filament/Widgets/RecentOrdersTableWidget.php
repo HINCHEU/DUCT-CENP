@@ -34,13 +34,12 @@ class RecentOrdersTableWidget extends BaseWidget
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'draft' => 'gray',
-                        'pending_manager_approval', 'pending_workshop_approval', 'pending_approval', 'pending' => 'warning',
-                        'approved' => 'info',
-                        'confirmed', 'in_progress' => 'primary',
-                        'completed', 'delivered' => 'success',
-                        'rejected', 'cancelled' => 'danger',
-                        default => 'gray',
+                        'draft'       => 'gray',
+                        'submitted'   => 'warning',
+                        'ready'       => 'info',
+                        'fabricating' => 'primary',
+                        'delivered'   => 'success',
+                        default       => 'gray',
                     }),
                 TextColumn::make('created_at')
                     ->label('Submitted')

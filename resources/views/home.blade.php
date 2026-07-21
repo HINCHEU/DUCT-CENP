@@ -142,7 +142,7 @@
 @section('content')
 <div class="dashboard-wrapper">
     <div class="home-hero">
-        <h1 class="home-title">Welcome to CE&P Hub</h1>
+        <h1 class="home-title">Welcome to CE&P DUCT</h1>
         <p class="home-subtitle">Manage your duct fabrication lifecycle — pick up right where you left off.</p>
     </div>
 

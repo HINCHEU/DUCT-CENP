@@ -16,16 +16,17 @@ class StatsOverview extends BaseWidget
     {
         $startOfMonth = Carbon::now()->startOfMonth();
 
-        // Orders Pending Approval
-        $pendingApprovals = Order::whereIn('status', ['pending_approval', 'pending_manager_approval', 'pending_workshop_approval', 'pending'])->count();
+        // Orders Pending Approval — "submitted" means awaiting review
+        $pendingApprovals = Order::whereIn('status', ['submitted'])->count();
 
-        // Total Area Fabricated this month (from OrderItem total_area)
-        $totalArea = OrderItem::whereHas('order', function($q) use ($startOfMonth) {
-            $q->whereIn('status', ['confirmed', 'approved', 'in_progress', 'completed'])->where('created_at', '>=', $startOfMonth);
+        // Total Area Fabricated this month from OrderItems whose order is active/done
+        $totalArea = OrderItem::whereHas('order', function ($q) use ($startOfMonth) {
+            $q->whereIn('status', ['ready', 'fabricating', 'delivered'])
+              ->where('created_at', '>=', $startOfMonth);
         })->sum('total_area');
 
-        // Total Active Orders (not draft, not delivered/completed)
-        $activeOrders = Order::whereNotIn('status', ['draft', 'completed', 'delivered'])->count();
+        // Total Active Orders (not draft, not delivered)
+        $activeOrders = Order::whereNotIn('status', ['draft', 'delivered'])->count();
 
         return [
             Stat::make('Pending Approvals', $pendingApprovals)

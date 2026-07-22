@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
+use Filament\Navigation\MenuItem;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -38,6 +39,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->font('Outfit')
             ->topNavigation()
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Back to App')
+                    ->icon('heroicon-o-arrow-left')
+                    ->url('/'),
+            ])
             ->spa()
             ->maxContentWidth('full')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

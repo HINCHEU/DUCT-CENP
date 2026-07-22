@@ -520,14 +520,14 @@ const DUCTS = {
         label: 'Size (W x H)',
         type: 'select',
         options: [
-          { value: '30', label: '30mm x 30mm' },
+          { value: '30', label: '30mm x 30mm', selected: true },
           { value: '40', label: '40mm x 40mm' },
           { value: '50', label: '50mm x 50mm' },
           { value: '75', label: '75mm x 75mm' }
         ]
       }
     ],
-    calc: f => `Angle bar: ${f.Size || 30}×${f.Size || 30}×L${f.L} Hole:Ø${f.HD || 12}mm Dist:25mm`,
+    calc: f => { const s = +f.Size || 30; const hd = +f.HD || 12; return `${s}×${s}×L${f.L} Hole:Ø${hd}mm Dist:25mm`; },
     area: f => (+f.L || 0) / 1000,
   },
   angle_bar_u: {
@@ -557,7 +557,7 @@ const DUCTS = {
         label: 'Size (W x H x D)',
         type: 'select',
         options: [
-          { value: '40', label: '40mm x 40mm x 40mm' },
+          { value: '40', label: '40mm x 40mm x 40mm', selected: true },
           { value: '50', label: '50mm x 50mm x 50mm' },
           { value: '80', label: '80mm x 80mm x 80mm' },
           { value: '100', label: '100mm x 100mm x 100mm' },
@@ -565,7 +565,7 @@ const DUCTS = {
         ]
       }
     ],
-    calc: f => `Angle bar (U Shape): ${f.Size || 50}×${f.Size || 50}×${f.Size || 50}×L${f.L} Hole:Ø${f.HD || 12}mm Dist:25mm`,
+    calc: f => { const s = +f.Size || 40; const hd = +f.HD || 12; return `${s}×${s}×${s}×L${f.L} Hole:Ø${hd}mm Dist:25mm`; },
     area: f => (+f.L || 0) / 1000,
   }
 };

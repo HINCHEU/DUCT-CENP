@@ -30,7 +30,7 @@ class OrderItem extends Model
         $key = optional($this->ductType)->formula_key;
 
         $v = function($k) use ($f) {
-            return $f[strtolower($k)] ?? $f[strtoupper($k)] ?? '';
+            return $f[$k] ?? $f[strtolower($k)] ?? $f[strtoupper($k)] ?? '';
         };
 
         switch ($key) {
@@ -86,9 +86,14 @@ class OrderItem extends Model
                 return "{$v('W1')}x{$v('D1')}";
             case '4ways':
                 return "{$v('A1')}x{$v('B1')}->{$v('A4')}x{$v('B4')}<->{$v('A2')}x{$v('B2')}xR{$v('R2')}<->{$v('A3')}x{$v('B3')}xR{$v('R1')}";
-            case 'angle_bar':
-            case 'angle_bar_u':
-                return "{$v('Size')}x{$v('Size')}xL{$v('L')} Hole:Ø{$v('HD')} Dist:{$v('Dist')}";
+            case 'angle_bar': {
+                $s = $v('Size') ?: 30;
+                return "{$s}x{$s}xL{$v('L')} Hole:Ø{$v('HD')}mm Dist:25mm";
+            }
+            case 'angle_bar_u': {
+                $s = $v('Size') ?: 40;
+                return "{$s}x{$s}x{$s}xL{$v('L')} Hole:Ø{$v('HD')}mm Dist:25mm";
+            }
             default:
                 $parts = [];
                 foreach ($f as $k => $val) {

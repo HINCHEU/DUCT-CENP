@@ -52,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('orders/{order}/items/{item}', [OrderItemController::class, 'updateManager'])->name('orders.items.update');
         Route::put('orders/{order}/items/{item}/quantity', [OrderItemController::class, 'updateQuantity'])->name('orders.items.updateQuantity');
         Route::patch('orders/{order}/items/{item}/remark', [OrderItemController::class, 'updateRemark'])->name('orders.items.updateRemark');
+        Route::delete('orders/{order}/items/{item}', [OrderItemController::class, 'destroy'])->name('orders.items.destroy');
     });
     
     // Workshop Routes

@@ -343,8 +343,11 @@ function onTypeChange() {
     const d = document.createElement('div');
     d.className = 'field-group' + (t.fields.length % 2 !== 0 && i === t.fields.length - 1 ? ' full' : '');
     if (f.type === 'select') {
-      let optionsHtml = f.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+      const defaultSel = f.options.find(o => o.selected);
+      let optionsHtml = f.options.map(opt => `<option value="${opt.value}"${opt.selected ? ' selected' : ''}>${opt.label}</option>`).join('');
       d.innerHTML = `<label class="field-label">${f.label}</label><select id="f_${f.id}" class="field-input" onchange="updatePreview()">${optionsHtml}</select>`;
+    } else if (f.type === 'fixed') {
+      d.innerHTML = `<label class="field-label">${f.label}</label><div id="f_${f.id}" class="field-input field-fixed" data-fixed-value="${f.value}" style="display:flex;align-items:center;background:#f0f3fa;color:#1B3F8B;font-weight:600;cursor:default;user-select:none;border:1.5px solid #c8d2ea;border-radius:6px;padding:0 10px;font-size:13px;">${f.value} mm <span style="margin-left:6px;font-size:10px;color:#8a97b8;font-weight:400;">(fixed)</span></div>`;
     } else {
       d.innerHTML = `<label class="field-label">${f.label}</label><input type="number" id="f_${f.id}" class="field-input" placeholder="mm" min="0" oninput="updatePreview()">`;
     }
@@ -374,7 +377,13 @@ function getVals() {
   const key = document.getElementById('duct-type').value;
   const t = DUCTS[key];
   const v = {};
-  t.fields.forEach(f => { v[f.id] = document.getElementById('f_' + f.id)?.value || 0; });
+  t.fields.forEach(f => {
+    if (f.type === 'fixed') {
+      v[f.id] = f.value;
+    } else {
+      v[f.id] = document.getElementById('f_' + f.id)?.value || 0;
+    }
+  });
   return v;
 }
 
@@ -423,7 +432,7 @@ function addItem() {
  */
 function clearFields() {
   const key = document.getElementById('duct-type').value;
-  DUCTS[key].fields.forEach(f => { const e = document.getElementById('f_' + f.id); if (e) e.value = ''; });
+  DUCTS[key].fields.forEach(f => { if (f.type === 'fixed') return; const e = document.getElementById('f_' + f.id); if (e) e.value = ''; });
   document.getElementById('qty').value = 1;
   document.getElementById('preview-area').innerHTML = `<div class="preview-muted">Fill dimensions above to preview surface area</div>`;
 }

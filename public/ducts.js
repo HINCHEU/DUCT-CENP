@@ -504,8 +504,17 @@ const DUCTS = {
     ],
     fields: [
       { id: 'L', label: 'Length L' },
-      { id: 'HD', label: 'Hole Diameter Ø' },
-      { id: 'Dist', label: 'Distance from End' },
+      {
+        id: 'HD',
+        label: 'Hole Diameter Ø',
+        type: 'select',
+        options: [
+          { value: '10', label: '10 mm' },
+          { value: '12', label: '12 mm', selected: true },
+          { value: '14', label: '14 mm' }
+        ]
+      },
+      { id: 'Dist', label: 'Distance from End', type: 'fixed', value: 25 },
       {
         id: 'Size',
         label: 'Size (W x H)',
@@ -518,7 +527,7 @@ const DUCTS = {
         ]
       }
     ],
-    calc: f => `Angle bar: ${f.Size || 30}×${f.Size || 30}×L${f.L} Hole:Ø${f.HD} Dist:${f.Dist}`,
+    calc: f => `Angle bar: ${f.Size || 30}×${f.Size || 30}×L${f.L} Hole:Ø${f.HD || 12}mm Dist:25mm`,
     area: f => (+f.L || 0) / 1000,
   },
   angle_bar_u: {
@@ -532,8 +541,17 @@ const DUCTS = {
     ],
     fields: [
       { id: 'L', label: 'Length L' },
-      { id: 'HD', label: 'Hole Diameter Ø' },
-      { id: 'Dist', label: 'Distance from End' },
+      {
+        id: 'HD',
+        label: 'Hole Diameter Ø',
+        type: 'select',
+        options: [
+          { value: '10', label: '10 mm' },
+          { value: '12', label: '12 mm', selected: true },
+          { value: '14', label: '14 mm' }
+        ]
+      },
+      { id: 'Dist', label: 'Distance from End', type: 'fixed', value: 25 },
       {
         id: 'Size',
         label: 'Size (W x H x D)',
@@ -547,7 +565,7 @@ const DUCTS = {
         ]
       }
     ],
-    calc: f => `Angle bar (U Shape): ${f.Size || 50}×${f.Size || 50}×${f.Size || 50}×L${f.L} Hole:Ø${f.HD} Dist:${f.Dist}`,
+    calc: f => `Angle bar (U Shape): ${f.Size || 50}×${f.Size || 50}×${f.Size || 50}×L${f.L} Hole:Ø${f.HD || 12}mm Dist:25mm`,
     area: f => (+f.L || 0) / 1000,
   }
 };

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Always run from the script's own directory (required for cron/scheduled tasks)
+cd "$(dirname "$(realpath "$0")")" || exit 1
+
 # Load environment variables from .env
 if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | awk '/=/ {print $1}')

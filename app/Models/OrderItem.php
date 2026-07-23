@@ -47,6 +47,7 @@ class OrderItem extends Model
             case 'duct_reducer':
                 return "{$v('A')}x{$v('B')}->{$v('C')}x{$v('D2')}xL{$v('L')}";
             case 'rect_to_round':
+            case 'collar_duct_rect_round':
                 return "{$v('A')}x{$v('B')}->Ø{$v('D')}xL{$v('L')}";
             case 'butterfly_round':
                 return "{$v('A')}x{$v('B')}->Ø{$v('D')}xR{$v('R1')}x{$v('L')}<->{$v('E')}x{$v('F')}xR{$v('R2')}";

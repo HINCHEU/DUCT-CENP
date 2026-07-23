@@ -271,14 +271,19 @@ function _hollowOffset(grp, W1, H1, W2, H2, offsetR, L) {
   });
 }
 
-function _rectToRound(grp, W, H, R, L) {
-  const m = _mats(); const segs = 32, half = L / 2;
-  const straightL = L / 2;
+function _rectToRound(grp, W, H, R, L, S = 1/800) {
+  const m = _mats(); const segs = 32;
+  const straightRect = 30 * S;
+  const straightRound = 100 * S;
+  const transL = Math.max(0.01 * S, L - straightRect - straightRound);
+  
+  const transStart = -L / 2 + straightRect;
+  const transEnd = L / 2 - straightRound;
 
   const straightGrp = new THREE.Group();
   const T = Math.max(Math.min(W, H, R * 2) * 0.08, 0.014);
-  _hollowRect(straightGrp, straightL, W, H, T);
-  straightGrp.position.x = -L / 4;
+  _hollowRect(straightGrp, straightRect, W, H, T);
+  straightGrp.position.x = -L / 2 + straightRect / 2;
   grp.add(straightGrp);
 
   const w_in = W - 2 * T, h_in = H - 2 * T, r_in = Math.max(R - T, R * 0.84);
@@ -295,21 +300,36 @@ function _rectToRound(grp, W, H, R, L) {
     };
     const [x0, y0] = blend(t0, W, H), [x1, y1] = blend(t1, W, H);
     const cx0 = R * Math.cos(t0), cy0 = R * Math.sin(t0), cx1 = R * Math.cos(t1), cy1 = R * Math.sin(t1);
-    vertsO.push(0, y0, x0, half, cy1, cx1, 0, y1, x1, 0, y0, x0, half, cy0, cx0, half, cy1, cx1);
+    
+    vertsO.push(
+      transStart, y0, x0, transEnd, cy1, cx1, transStart, y1, x1,
+      transStart, y0, x0, transEnd, cy0, cx0, transEnd, cy1, cx1
+    );
 
     const [xi0, yi0] = blend(t0, w_in, h_in), [xi1, yi1] = blend(t1, w_in, h_in);
     const cxi0 = r_in * Math.cos(t0), cyi0 = r_in * Math.sin(t0), cxi1 = r_in * Math.cos(t1), cyi1 = r_in * Math.sin(t1);
-    vertsI.push(0, yi0, xi0, 0, yi1, xi1, half, cyi1, cxi1, 0, yi0, xi0, half, cyi1, cxi1, half, cyi0, cxi0);
+    
+    vertsI.push(
+      transStart, yi0, xi0, transStart, yi1, xi1, transEnd, cyi1, cxi1,
+      transStart, yi0, xi0, transEnd, cyi1, cxi1, transEnd, cyi0, cxi0
+    );
   }
 
   const gO = new THREE.BufferGeometry(); gO.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertsO), 3)); gO.computeVertexNormals(); _mesh(grp, gO, m.galv);
   const gI = new THREE.BufferGeometry(); gI.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertsI), 3)); gI.computeVertexNormals(); _mesh(grp, gI, m.inner);
 
-  _flangeRect(grp, -half, W, H, m);
+  _flangeRect(grp, -L / 2, W, H, m);
 
   const cs = new THREE.Shape(); cs.absarc(0, 0, R, 0, Math.PI * 2, false);
   const ch = new THREE.Path(); ch.absarc(0, 0, r_in, 0, Math.PI * 2, true); cs.holes.push(ch);
-  const ccg = new THREE.ShapeGeometry(cs, 32); const ccm = new THREE.Mesh(ccg, m.flange); ccm.rotation.y = Math.PI / 2; ccm.position.x = half; grp.add(ccm);
+  
+  const roundGeo = new THREE.ExtrudeGeometry(cs, { depth: straightRound, bevelEnabled: false, curveSegments: 32 });
+  const roundMesh = new THREE.Mesh(roundGeo, m.galv);
+  roundMesh.rotation.y = Math.PI / 2;
+  roundMesh.position.x = transEnd;
+  grp.add(roundMesh);
+
+  const ccg = new THREE.ShapeGeometry(cs, 32); const ccm = new THREE.Mesh(ccg, m.flange); ccm.rotation.y = Math.PI / 2; ccm.position.x = L / 2; grp.add(ccm);
 }
 
 function _hollowYAsymmetric(grp, A, B, C, D, E, FF, L, R) {
@@ -1151,11 +1171,13 @@ function build3DDuct(key, f) {
       _3d.setRot(0.40, 0.60);
       _fitCam(L, H + B, W); break;
     }
+    case 'collar_duct_rect_round':
     case 'rect_to_round': {
       const W = (+f.A || 300) * S, H = (+f.B || 250) * S, D = (+f.D || 200) * S, L = (+f.L || 300) * S;
-      _rectToRound(pivot, W, H, D / 2, L);
+      _rectToRound(pivot, W, H, D / 2, L, S);
+      const topY = Math.max(H / 2, D / 2) + 0.12;
       _3d.dimLines = [
-        { p1: _v3(-L / 2, H / 2 + 0.12, 0), p2: _v3(L / 2, D / 2 + 0.12, 0), text: f.L ? `L ${f.L} mm` : 'L' },
+        { p1: _v3(-L / 2, topY, 0), p2: _v3(L / 2, topY, 0), text: f.L ? `L ${f.L} mm` : 'L' },
         { p1: _v3(-L / 2 - 0.13, -H / 2, 0), p2: _v3(-L / 2 - 0.13, H / 2, 0), text: f.B ? `${f.B} mm` : 'B' },
         { p1: _v3(-L / 2, -H / 2 - 0.12, -W / 2), p2: _v3(-L / 2, -H / 2 - 0.12, W / 2), text: f.A ? `${f.A} mm` : 'A' },
         { p1: _v3(L / 2 + 0.13, -D / 2, 0), p2: _v3(L / 2 + 0.13, D / 2, 0), text: f.D ? `Ø${f.D} mm` : 'D', color: '#D72B2B' },
@@ -1288,11 +1310,13 @@ function build3DDuct(key, f) {
         { p1: _v3(0, 0, W1 / 2 + 0.12), p2: _v3(0, RL, W1 / 2 + 0.12), text: f.R ? `R ${f.R} mm` : 'R', color: '#D72B2B' },
       ]; _fitCam(L, Math.max(H1, H2) + RL, Math.max(W1, W2)); break;
     }
+    case 'collar_duct_rect_round':
     case 'rect_to_round': {
       const W = (+f.A || 500) * S, H = (+f.B || 400) * S, R = (+f.D || 300) / 2 * S, L = (+f.L || 500) * S;
-      _rectToRound(pivot, W, H, R, L);
+      _rectToRound(pivot, W, H, R, L, S);
+      const topY = Math.max(H / 2, R) + 0.1;
       _3d.dimLines = [
-        { p1: _v3(-L / 2, H / 2 + 0.1, 0), p2: _v3(L / 2, R + 0.1, 0), text: f.L ? `L ${f.L} mm` : 'L' },
+        { p1: _v3(-L / 2, topY, 0), p2: _v3(L / 2, topY, 0), text: f.L ? `L ${f.L} mm` : 'L' },
         { p1: _v3(-L / 2 - 0.12, -H / 2, 0), p2: _v3(-L / 2 - 0.12, H / 2, 0), text: f.B ? `${f.B} mm` : 'B' },
         { p1: _v3(L / 2 + 0.08, R + 0.05, 0), p2: _v3(L / 2 + 0.08, -R - 0.05, 0), text: f.D ? `Ø${f.D} mm` : 'D', color: '#D72B2B' },
       ]; _fitCam(L, Math.max(H, R * 2), Math.max(W, R * 2)); break;

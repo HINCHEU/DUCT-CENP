@@ -37,13 +37,17 @@ class DuctAreaCalculator
                 return 2 * ($a + $b) / 1000 * ($l / 1000 * 1.2);
 
             case 'rect_to_round':
+            case 'collar_duct_rect_round':
                 $a = (float)($f['A'] ?? 0);
                 $b = (float)($f['B'] ?? 0);
                 $d = (float)($f['D'] ?? 0);
                 $l = (float)($f['L'] ?? 0);
                 $pRect = 2 * ($a + $b);
                 $pRound = pi() * $d;
-                return ($pRect * ($l / 2) + (($pRect + $pRound) / 2) * ($l / 2)) / 1000000;
+                $straightRect = 30;
+                $straightRound = 100;
+                $transL = max(0, $l - $straightRect - $straightRound);
+                return ($pRect * $straightRect + $pRound * $straightRound + (($pRect + $pRound) / 2) * $transL) / 1000000;
 
             case 'butterfly_round':
                 $a = (float)($f['A'] ?? 0);

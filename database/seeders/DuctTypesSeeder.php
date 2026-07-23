@@ -23,10 +23,12 @@ class DuctTypesSeeder extends Seeder
             ['name' => 'Round Elbow 45', 'formula_key' => 'round_elbow45', 'config' => ['fields' => ['D', 'R']]],
             ['name' => 'Duct Reducer', 'formula_key' => 'duct_reducer', 'config' => ['fields' => ['A', 'B', 'C', 'D2', 'L']]],
             ['name' => 'Rect to Round', 'formula_key' => 'rect_to_round', 'config' => ['fields' => ['A', 'B', 'D', 'L']]],
+
             ['name' => 'Butterfly Round', 'formula_key' => 'butterfly_round', 'config' => ['fields' => ['A', 'B', 'D', 'L', 'R1', 'E', 'F', 'R2']]],
             ['name' => 'Butterfly Round Two', 'formula_key' => 'butterfly_round_two', 'config' => ['fields' => ['A', 'B', 'D1', 'L1', 'R1', 'D2', 'L2', 'R2']]],
             ['name' => 'Butterfly Rect', 'formula_key' => 'butterfly_rect', 'config' => ['fields' => ['A', 'B', 'C', 'D2', 'R1', 'E', 'F', 'R2']]],
-            ['name' => 'Collar Duct', 'formula_key' => 'collar_duct', 'config' => ['fields' => ['A', 'B', 'C', 'D2', 'L']]],
+            ['name' => 'Collar Duct (Rect-Rect)', 'formula_key' => 'collar_duct', 'config' => ['fields' => ['A', 'B', 'C', 'D2', 'L']]],
+            ['name' => 'Collar Duct (rect-round)', 'formula_key' => 'collar_duct_rect_round', 'config' => ['fields' => ['A', 'B', 'D', 'L']]],
             ['name' => 'Offset Duct', 'formula_key' => 'offset_duct', 'config' => ['fields' => ['A', 'B', 'C', 'D2', 'R', 'L']]],
             ['name' => 'Offset Duct Straight', 'formula_key' => 'offset_duct_straight', 'config' => ['fields' => ['A', 'B', 'R', 'L', 'L1', 'L2']]],
             ['name' => 'Offset Duct Angular', 'formula_key' => 'offset_duct_angular', 'config' => ['fields' => ['A', 'B', 'R', 'L', 'Rc', 'A1', 'A2']]],

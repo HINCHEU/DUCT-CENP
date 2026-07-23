@@ -72,12 +72,16 @@ const DUCTS = {
     tag: 'Rect to Round',
     fields: [{ id: 'A', label: 'Width A' }, { id: 'B', label: 'Height B' }, { id: 'D', label: 'Diameter Ø' }, { id: 'L', label: 'Length L' }],
     calc: f => `Rectangle to Round : ${f.A}x${f.B} -> Ø${f.D}mmxL${f.L}`,
-    // Half straight rect (L/2) + half transition to round (L/2)
+    // Straight rect 30mm + transition + straight round 100mm
     area: f => {
       const pRect = 2 * (+f.A + +f.B), pRound = Math.PI * (+f.D), l = +f.L;
-      return (pRect * (l / 2) + ((pRect + pRound) / 2) * (l / 2)) / 1000000;
+      const straightRect = 30;
+      const straightRound = 100;
+      const transL = Math.max(0, l - straightRect - straightRound);
+      return (pRect * straightRect + pRound * straightRound + ((pRect + pRound) / 2) * transL) / 1000000;
     },
   },
+
   butterfly_round: {
     label: 'Butterfly Duct (One Side Round)',
     tag: 'Butterfly',
@@ -146,12 +150,26 @@ const DUCTS = {
     },
   },
   collar_duct: {
-    label: 'Collar Duct',
+    label: 'Collar Duct (Rect-Rect)',
     tag: 'Collar',
     fields: [{ id: 'A', label: 'Start Width A' }, { id: 'B', label: 'Start Height B' }, { id: 'C', label: 'End Width C' }, { id: 'D2', label: 'End Height D' }, { id: 'L', label: 'Length L' }],
     calc: f => `Collar: ${f.A}×${f.B}→${f.C}×${f.D2}×L${f.L}`,
     // Excel: Perimeter=2*(A+B)/1000 (larger end), EqLen=L/1000*1.2
     area: f => { const a = +f.A, c = +f.C, l = +f.L; return 2 * (a + c) / 1000 * (l / 1000 * 1.2); },
+  },
+  collar_duct_rect_round: {
+    label: 'Collar Duct (Rect-Round)',
+    tag: 'Collar Rect-Round',
+    fields: [{ id: 'A', label: 'Width A' }, { id: 'B', label: 'Height B' }, { id: 'D', label: 'Diameter Ø' }, { id: 'L', label: 'Length L' }],
+    calc: f => `Collar Duct (rect-round) : ${f.A}x${f.B} -> Ø${f.D}mmxL${f.L}`,
+    // Straight rect 30mm + transition + straight round 100mm
+    area: f => {
+      const pRect = 2 * (+f.A + +f.B), pRound = Math.PI * (+f.D), l = +f.L;
+      const straightRect = 30;
+      const straightRound = 100;
+      const transL = Math.max(0, l - straightRect - straightRound);
+      return (pRect * straightRect + pRound * straightRound + ((pRect + pRound) / 2) * transL) / 1000000;
+    },
   },
   offset_duct: {
     label: 'Offset Duct',

@@ -24,6 +24,7 @@ install:
 	docker compose exec app php artisan db:seed --force
 	docker compose exec app php artisan shield:generate --all
 	docker compose exec app php artisan shield:super-admin --user=1
+	docker compose exec app php artisan storage:link
 	@echo "==> Installation complete! The app is now live."
 
 update:
@@ -32,6 +33,7 @@ update:
 	git pull
 	docker compose up -d --build app
 	docker compose exec app php artisan migrate --force
+	docker compose exec app php artisan storage:link
 	@bash notify_update.sh
 	@echo "==> Update complete!"
 
@@ -59,6 +61,7 @@ reset:
 		docker compose exec app php artisan migrate:fresh --seed --force; \
 		docker compose exec app php artisan shield:generate --all; \
 		docker compose exec app php artisan shield:super-admin --user=1; \
+		docker compose exec app php artisan storage:link; \
 		echo "==> Reset complete!"; \
 	else \
 		echo "==> Reset aborted."; \

@@ -140,15 +140,29 @@
     @endif
 
     @php
+      $sigBase64 = function($sig) {
+          if (!$sig) return null;
+          $path = storage_path('app/public/' . $sig);
+          if (file_exists($path)) {
+              $type = pathinfo($path, PATHINFO_EXTENSION);
+              $data = file_get_contents($path);
+              return 'data:image/' . $type . ';base64,' . base64_encode($data);
+          }
+          return null;
+      };
+
       $cName = optional($order->creator)->name ?? '';
+      $cSig = $sigBase64(optional($order->creator)->signature);
       $cLen = strlen($cName);
       $cSize = $cLen > 18 ? '9px' : ($cLen > 14 ? '10px' : '11px');
 
       $aName = optional($order->approver)->name ?? '';
+      $aSig = $sigBase64(optional($order->approver)->signature);
       $aLen = strlen($aName);
       $aSize = $aLen > 18 ? '9px' : ($aLen > 14 ? '10px' : '11px');
 
       $wName = optional($order->confirmer)->name ?? '';
+      $wSig = $sigBase64(optional($order->confirmer)->signature);
       $wLen = strlen($wName);
       $wSize = $wLen > 18 ? '9px' : ($wLen > 14 ? '10px' : '11px');
     @endphp
@@ -156,15 +170,23 @@
       <tr>
         <td class="sig-col" style="width:33.33%">
           <div class="sig-title">Prepared By</div>
-          <div class="sig-space"></div>
+          <div class="sig-space" style="text-align: center; height: 80px; padding-top: 5px;">
+            @if($cSig)
+                <img src="{{ $cSig }}" style="max-height: 70px; max-width: 100%;" />
+            @endif
+          </div>
           <div class="sig-details">
             Name: <span style="font-size: {{ $cSize }}; white-space: nowrap; letter-spacing: -0.2px;">{{ $cName }}</span><br>
             Date: {{ $order->submitted_at ? $order->submitted_at->format('d/M/Y') : $order->created_at->format('d/M/Y') }}
           </div>
         </td>
         <td class="sig-col" style="width:33.33%">
-          <div class="sig-title">approved By</div>
-          <div class="sig-space"></div>
+          <div class="sig-title">Approved By</div>
+          <div class="sig-space" style="text-align: center; height: 80px; padding-top: 5px;">
+            @if($aSig)
+                <img src="{{ $aSig }}" style="max-height: 70px; max-width: 100%;" />
+            @endif
+          </div>
           <div class="sig-details">
             Name: <span style="font-size: {{ $aSize }}; white-space: nowrap; letter-spacing: -0.2px;">{{ $aName }}</span><br>
             Date: {{ $order->approved_at ? $order->approved_at->format('d/M/Y') : '' }}
@@ -172,7 +194,11 @@
         </td>
         <td class="sig-col" style="width:33.34%">
           <div class="sig-title">Confirmed by</div>
-          <div class="sig-space"></div>
+          <div class="sig-space" style="text-align: center; height: 80px; padding-top: 5px;">
+            @if($wSig)
+                <img src="{{ $wSig }}" style="max-height: 70px; max-width: 100%;" />
+            @endif
+          </div>
           <div class="sig-details">
             Name: <span style="font-size: {{ $wSize }}; white-space: nowrap; letter-spacing: -0.2px;">{{ $wName }}</span><br>
             Date: {{ $order->confirmed_at ? $order->confirmed_at->format('d/M/Y') : '' }}

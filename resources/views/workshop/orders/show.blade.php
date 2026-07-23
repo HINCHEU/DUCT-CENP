@@ -31,15 +31,6 @@
             color: #0d1a3a;
             font-weight: 500;
         }
-        .status-actions {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 15px;
         }
     </style>
 @endpush
@@ -68,29 +59,25 @@
                 <span class="meta-value">{{ $order->requested_delivery_date ? $order->requested_delivery_date->format('M d, Y') : 'TBD' }}</span>
             </div>
         </div>
-        <div>
+        <div style="display:flex; gap: 10px; align-items: center;">
             <a href="{{ route('orders.report', $order) }}" target="_blank" class="btn btn-secondary">Download Cut List PDF</a>
+            @if($order->status !== 'delivered')
+                <form action="{{ route('workshop.orders.status', $order) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @if($order->status === 'approved')
+                        <input type="hidden" name="status" value="fabricating">
+                        <button type="submit" class="btn btn-primary" style="background-color: var(--navy); border:none;">Start Fabrication</button>
+                    @elseif($order->status === 'fabricating')
+                        <input type="hidden" name="status" value="ready">
+                        <button type="submit" class="btn btn-primary" style="background-color: #3730a3; border:none;">Mark as Ready</button>
+                    @elseif($order->status === 'ready')
+                        <input type="hidden" name="status" value="delivered">
+                        <button type="submit" class="btn btn-primary" style="background-color: #115e59; border:none;">Mark as Delivered</button>
+                    @endif
+                </form>
+            @endif
         </div>
     </div>
-
-    @if($order->status !== 'delivered')
-    <div class="status-actions">
-        <h4 style="margin:0;">Update Status:</h4>
-        <form action="{{ route('workshop.orders.status', $order) }}" method="POST" style="display:flex; gap:10px; align-items:center;">
-            @csrf
-            @if($order->status === 'approved')
-                <input type="hidden" name="status" value="fabricating">
-                <button type="submit" class="btn btn-primary" style="background-color:#92400e;">Start Fabrication</button>
-            @elseif($order->status === 'fabricating')
-                <input type="hidden" name="status" value="ready">
-                <button type="submit" class="btn btn-primary" style="background-color:#3730a3;">Mark as Ready</button>
-            @elseif($order->status === 'ready')
-                <input type="hidden" name="status" value="delivered">
-                <button type="submit" class="btn btn-primary" style="background-color:#115e59;">Mark as Delivered</button>
-            @endif
-        </form>
-    </div>
-    @endif
 
     @php
         $totalQty = $order->items->sum('quantity');

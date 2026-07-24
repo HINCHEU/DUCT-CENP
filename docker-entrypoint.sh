@@ -11,6 +11,6 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Start Apache in the foreground
-echo "Starting Apache..."
-apache2-foreground
+# Start PHP-FPM in the foreground
+echo "Starting PHP-FPM..."
+php-fpm

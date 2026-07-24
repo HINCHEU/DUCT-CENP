@@ -31,7 +31,7 @@ update:
 	@bash backup.sh
 	@echo "==> Updating DUCT-CENP..."
 	git pull
-	docker compose up -d --build app
+	docker compose up -d --build
 	docker compose exec app php artisan migrate --force
 	docker compose exec app php artisan storage:link
 	@bash notify_update.sh

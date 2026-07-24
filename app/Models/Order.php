@@ -3,10 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Order extends Model
 {
+    use LogsActivity;
+
     protected $fillable = ['order_number', 'site_id', 'created_by', 'approved_by', 'confirmed_by', 'status', 'priority', 'notes', 'requested_delivery_date', 'rejection_reason', 'revision_of', 'submitted_at', 'approved_at', 'confirmed_at'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
 
     protected function casts(): array
     {

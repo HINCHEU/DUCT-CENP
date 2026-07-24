@@ -37,7 +37,7 @@ class OrderController extends Controller
             $query->where('priority', $request->priority);
         }
 
-        $orders = $query->oldest()->paginate(15)->withQueryString();
+        $orders = $query->latest()->paginate(15)->withQueryString();
             
         return view('engineer.orders.index', compact('orders'));
     }

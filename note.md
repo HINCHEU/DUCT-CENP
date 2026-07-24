@@ -8,6 +8,6 @@
 ===============================
 - 100 mm from round and 50 from rec: duct reducer from rect to round
 - butterfly duct
-- add rec to round colar
+- add rec to round colar done
 - start fabrication  should be after status done
 - sign module on sign report pdf done
